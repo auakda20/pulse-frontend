@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { sessionService, goalService, activityService } from '../services/api'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { LogIn, LogOut, Plus, Check, Trash2, Users, Clock } from 'lucide-react'
+import { LogIn, LogOut, Plus, Check, Trash2, Users, Clock, BarChart2 } from 'lucide-react'
 
 const VERTICALS = ['studio', 'originals', 'auto', 'agency', 'geral']
 const V_LABEL   = { studio: 'Studio', originals: 'Originals', auto: 'Auto', agency: 'Agency', geral: 'Geral' }
@@ -14,10 +14,11 @@ function fmtMinutes(min) {
   return `${Math.floor(min / 60)}h ${min % 60}min`
 }
 
-function useTimer(checkinAt) {
+// Retorna minutos decorridos desde checkinAt
+function useElapsed(checkinAt) {
   const [elapsed, setElapsed] = useState(0)
   useEffect(() => {
-    if (!checkinAt) return
+    if (!checkinAt) { setElapsed(0); return }
     const tick = () => setElapsed(Math.floor((Date.now() - new Date(checkinAt)) / 60000))
     tick()
     const id = setInterval(tick, 30000)
@@ -27,9 +28,9 @@ function useTimer(checkinAt) {
 }
 
 export default function DashboardPage() {
-  const navigate  = useNavigate()
-  const qc        = useQueryClient()
-  const user      = JSON.parse(localStorage.getItem('pulse_user') || '{}')
+  const navigate = useNavigate()
+  const qc       = useQueryClient()
+  const user     = JSON.parse(localStorage.getItem('pulse_user') || '{}')
 
   const [goalTitle,    setGoalTitle]    = useState('')
   const [goalVertical, setGoalVertical] = useState('geral')
@@ -37,11 +38,20 @@ export default function DashboardPage() {
   const [actVertical,  setActVertical]  = useState('geral')
   const [actDesc,      setActDesc]      = useState('')
 
-  const { data: session }    = useQuery({ queryKey: ['session'],    queryFn: sessionService.today,   refetchInterval: 60000 })
+  // { sessions, openSession, totalMinutes }
+  const { data: todayData }  = useQuery({ queryKey: ['session'],    queryFn: sessionService.today,   refetchInterval: 60000 })
   const { data: goals = [] } = useQuery({ queryKey: ['goals'],      queryFn: goalService.today,      refetchInterval: 30000 })
   const { data: acts  = [] } = useQuery({ queryKey: ['activities'], queryFn: activityService.today,  refetchInterval: 30000 })
 
-  const elapsed = useTimer(session?.checkinAt)
+  const openSession  = todayData?.openSession || null
+  const closedTotal  = todayData?.totalMinutes || 0
+  const hadSession   = (todayData?.sessions?.length || 0) > 0
+  const isCheckedIn  = !!openSession
+
+  // Tempo decorrido na sessão atual (se aberta)
+  const elapsed = useElapsed(openSession?.checkinAt)
+  // Total acumulado = sessões fechadas + sessão atual em andamento
+  const totalDisplay = closedTotal + (isCheckedIn ? elapsed : 0)
 
   const checkinMut  = useMutation({ mutationFn: sessionService.checkin,  onSuccess: () => { qc.invalidateQueries({ queryKey: ['session'] }); toast.success('Check-in feito!') }, onError: e => toast.error(e.response?.data?.error || 'Erro') })
   const checkoutMut = useMutation({ mutationFn: sessionService.checkout, onSuccess: () => { qc.invalidateQueries({ queryKey: ['session'] }); toast.success('Check-out feito!') }, onError: e => toast.error(e.response?.data?.error || 'Erro') })
@@ -57,9 +67,10 @@ export default function DashboardPage() {
     navigate('/login')
   }
 
-  const isCheckedIn  = !!session?.checkinAt
-  const isCheckedOut = !!session?.checkoutAt
   const completedGoals = goals.filter(g => g.completed).length
+
+  // Texto de status
+  const statusLabel = isCheckedIn ? 'Em trabalho' : hadSession ? 'Em pausa' : 'Pronto para começar?'
 
   return (
     <div className="min-h-screen p-4 md:p-6 max-w-2xl mx-auto">
@@ -75,6 +86,9 @@ export default function DashboardPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <button onClick={() => navigate('/history')} className="btn-ghost text-xs gap-1.5">
+            <BarChart2 size={14} /> Histórico
+          </button>
           <button onClick={() => navigate('/team')} className="btn-ghost text-xs gap-1.5">
             <Users size={14} /> Time
           </button>
@@ -86,13 +100,28 @@ export default function DashboardPage() {
       <div className="card mb-4">
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-white font-semibold text-sm mb-0.5">
-              {!isCheckedIn ? 'Pronto para começar?' : isCheckedOut ? 'Dia encerrado' : 'Em trabalho'}
-            </div>
+            <div className="text-white font-semibold text-sm mb-0.5">{statusLabel}</div>
             <div className="text-muted text-xs flex items-center gap-1">
               <Clock size={12} />
-              {isCheckedOut ? fmtMinutes(session.totalMinutes) : isCheckedIn ? `${fmtMinutes(elapsed)} trabalhados` : 'Sem check-in hoje'}
+              {totalDisplay > 0
+                ? `${fmtMinutes(totalDisplay)} trabalhados hoje`
+                : isCheckedIn
+                  ? `${fmtMinutes(elapsed)} nesta sessão`
+                  : 'Sem check-in hoje'}
             </div>
+            {/* Histórico de sessões do dia */}
+            {hadSession && (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {todayData.sessions.map((s, i) => (
+                  <span key={s.id} className="text-xs text-muted bg-surface border border-border rounded px-2 py-0.5">
+                    {new Date(s.checkinAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                    {s.checkoutAt
+                      ? ` – ${new Date(s.checkoutAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} (${fmtMinutes(s.durationMinutes)})`
+                      : ' → agora'}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
           <div className="flex gap-2">
             {!isCheckedIn && (
@@ -100,7 +129,7 @@ export default function DashboardPage() {
                 <LogIn size={14} /> Check-in
               </button>
             )}
-            {isCheckedIn && !isCheckedOut && (
+            {isCheckedIn && (
               <button onClick={() => checkoutMut.mutate()} disabled={checkoutMut.isPending} className="btn-outline text-xs gap-1.5">
                 <LogOut size={14} /> Check-out
               </button>
@@ -118,7 +147,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Adicionar meta */}
         <div className="flex gap-2 mb-3">
           <input className="input text-xs py-1.5 flex-1" placeholder="Nova meta..."
             value={goalTitle} onChange={e => setGoalTitle(e.target.value)}

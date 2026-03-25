@@ -9,21 +9,22 @@ api.interceptors.request.use(cfg => {
 })
 
 export const authService = {
-  login: (body)  => api.post('/auth/login', body).then(r => r.data),
-  me:    ()      => api.get('/auth/me').then(r => r.data),
+  login: (body) => api.post('/auth/login', body).then(r => r.data),
+  me:    ()     => api.get('/auth/me').then(r => r.data),
 }
 
 export const sessionService = {
-  checkin:  ()  => api.post('/sessions/checkin').then(r => r.data),
-  checkout: ()  => api.post('/sessions/checkout').then(r => r.data),
-  today:    ()  => api.get('/sessions/today').then(r => r.data),
+  checkin:  ()        => api.post('/sessions/checkin').then(r => r.data),
+  checkout: ()        => api.post('/sessions/checkout').then(r => r.data),
+  today:    ()        => api.get('/sessions/today').then(r => r.data),
+  history:  (range)   => api.get(`/sessions/history?range=${range}`).then(r => r.data),
 }
 
 export const goalService = {
-  today:   ()          => api.get('/goals/today').then(r => r.data),
-  create:  (body)      => api.post('/goals', body).then(r => r.data),
-  toggle:  (id)        => api.patch(`/goals/${id}`).then(r => r.data),
-  remove:  (id)        => api.delete(`/goals/${id}`).then(r => r.data),
+  today:  ()      => api.get('/goals/today').then(r => r.data),
+  create: (body)  => api.post('/goals', body).then(r => r.data),
+  toggle: (id)    => api.patch(`/goals/${id}`).then(r => r.data),
+  remove: (id)    => api.delete(`/goals/${id}`).then(r => r.data),
 }
 
 export const activityService = {
@@ -33,5 +34,6 @@ export const activityService = {
 }
 
 export const teamService = {
-  today: () => api.get('/team/today').then(r => r.data),
+  today:   ()       => api.get('/team/today').then(r => r.data),
+  history: (range)  => api.get(`/team/history?range=${range}`).then(r => r.data),
 }

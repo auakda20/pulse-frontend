@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { teamService } from '../services/api'
 import { useNavigate } from 'react-router-dom'
-import { Clock, Check, Target, Zap } from 'lucide-react'
+import { Clock, Check, Target, Zap, BarChart2 } from 'lucide-react'
 
 const V_LABEL = { studio: 'Studio', originals: 'Originals', auto: 'Auto', agency: 'Agency', geral: 'Geral' }
 const V_COLOR = { studio: 'bg-purple-500/10 text-purple-400 border-purple-500/20', originals: 'bg-blue-500/10 text-blue-400 border-blue-500/20', auto: 'bg-green/10 text-green border-green/20', agency: 'bg-yellow/10 text-yellow border-yellow/20', geral: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20' }
@@ -12,9 +12,9 @@ function fmtMinutes(min) {
 }
 
 function StatusDot({ session }) {
-  if (!session) return <span className="w-2 h-2 rounded-full bg-zinc-600 inline-block" />
-  if (session.checkoutAt) return <span className="w-2 h-2 rounded-full bg-yellow inline-block" />
-  return <span className="w-2 h-2 rounded-full bg-green inline-block animate-pulse" />
+  if (!session?.sessions?.length) return <span className="w-2 h-2 rounded-full bg-zinc-600 inline-block" />
+  if (session.openSession) return <span className="w-2 h-2 rounded-full bg-green inline-block animate-pulse" />
+  return <span className="w-2 h-2 rounded-full bg-yellow inline-block" />
 }
 
 function fmtTime(iso) {
@@ -25,8 +25,8 @@ function fmtTime(iso) {
 export default function TeamPage() {
   const navigate = useNavigate()
   const { data: team = [], isLoading } = useQuery({
-    queryKey:       ['team-today'],
-    queryFn:        teamService.today,
+    queryKey:        ['team-today'],
+    queryFn:         teamService.today,
     refetchInterval: 60000,
   })
 
@@ -38,7 +38,12 @@ export default function TeamPage() {
           <h1 className="text-xl font-bold text-white flex items-center gap-2">⚡ Pulse <span className="text-muted font-normal text-base">— painel do time</span></h1>
           <p className="text-muted text-xs mt-0.5">{new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
         </div>
-        <button onClick={() => navigate('/login')} className="btn-outline text-xs">Meu dia →</button>
+        <div className="flex items-center gap-2">
+          <button onClick={() => navigate('/history')} className="btn-ghost text-xs gap-1.5">
+            <BarChart2 size={14} /> Histórico
+          </button>
+          <button onClick={() => navigate('/login')} className="btn-outline text-xs">Meu dia →</button>
+        </div>
       </div>
 
       {isLoading && <div className="text-muted text-sm text-center py-16 animate-pulse">Carregando...</div>}
@@ -46,7 +51,7 @@ export default function TeamPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {team.map(({ user, session, goals, activities }) => {
           const completedGoals = goals.filter(g => g.completed).length
-          const isOnline = session?.checkinAt && !session?.checkoutAt
+          const isOnline = !!session?.openSession
 
           return (
             <div key={user.id} className={`card flex flex-col gap-4 ${isOnline ? 'border-green/20' : ''}`}>
@@ -62,7 +67,11 @@ export default function TeamPage() {
                   <div className="text-white font-semibold text-sm">{user.name}</div>
                   <div className="text-muted text-xs flex items-center gap-1">
                     <Clock size={10} />
-                    {session ? (session.checkoutAt ? fmtMinutes(session.totalMinutes) : `desde ${fmtTime(session.checkinAt)}`) : 'Sem check-in'}
+                    {session?.openSession
+                      ? `trabalhando desde ${fmtTime(session.openSession.checkinAt)}`
+                      : session?.totalMinutes
+                        ? fmtMinutes(session.totalMinutes) + ' hoje'
+                        : 'Sem check-in'}
                   </div>
                 </div>
               </div>
@@ -109,7 +118,7 @@ export default function TeamPage() {
                 </div>
               )}
 
-              {!session && goals.length === 0 && activities.length === 0 && (
+              {!session?.sessions?.length && goals.length === 0 && activities.length === 0 && (
                 <p className="text-muted text-xs text-center py-2">Nenhuma atividade hoje ainda</p>
               )}
             </div>
