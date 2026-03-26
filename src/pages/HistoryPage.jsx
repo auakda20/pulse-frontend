@@ -10,24 +10,29 @@ const RANGES = [
   { key: 'year',  label: 'Ano' },
 ]
 
+// Retorna a data atual no fuso BRT como string YYYY-MM-DD
+function todayBRT() {
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' })
+}
+
 function getDates(range) {
   const dates = []
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
+  // Usar noon UTC do dia BRT para evitar problemas de DST
+  const today = new Date(todayBRT() + 'T12:00:00Z')
 
   if (range === 'year') {
     for (let i = 11; i >= 0; i--) {
       const d = new Date(today)
-      d.setDate(1)
-      d.setMonth(d.getMonth() - i)
-      dates.push(d.toISOString().slice(0, 7)) // YYYY-MM
+      d.setUTCDate(1)
+      d.setUTCMonth(d.getUTCMonth() - i)
+      dates.push(d.toISOString().slice(0, 7))
     }
   } else {
     const days = range === 'week' ? 7 : 30
     for (let i = days - 1; i >= 0; i--) {
       const d = new Date(today)
-      d.setDate(d.getDate() - i)
-      dates.push(d.toISOString().slice(0, 10)) // YYYY-MM-DD
+      d.setUTCDate(d.getUTCDate() - i)
+      dates.push(d.toISOString().slice(0, 10))
     }
   }
   return dates
@@ -46,36 +51,51 @@ function fmtColLabel(key, range) {
     const [y, m] = key.split('-')
     return new Date(+y, +m - 1, 1).toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '')
   }
-  const d = new Date(key + 'T12:00:00')
-  const weekday = d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '')
-  return `${weekday} ${d.getDate()}`
+  const d = new Date(key + 'T12:00:00Z')
+  const weekday = d.toLocaleDateString('pt-BR', { weekday: 'short', timeZone: 'UTC' }).replace('.', '')
+  return `${weekday} ${d.getUTCDate()}`
 }
 
-function HeatCell({ minutes }) {
-  if (!minutes) {
+function HeatCell({ data }) {
+  const minutes         = data?.minutes || 0
+  const goalsCompleted  = data?.goalsCompleted || 0
+  const goalsTotal      = data?.goalsTotal || 0
+  const activitiesCount = data?.activitiesCount || 0
+  const hasData         = minutes > 0 || goalsTotal > 0 || activitiesCount > 0
+
+  if (!hasData) {
     return (
       <td className="border border-border/20 px-2 py-2.5 text-center text-xs min-w-[56px]">
         <span className="text-muted/30">—</span>
       </td>
     )
   }
+
   const hours     = minutes / 60
-  const intensity = Math.min(hours / 8, 1) // 8h = intensidade máxima
-  const alpha     = 0.12 + intensity * 0.72
+  const intensity = Math.min(hours / 8, 1)
+  const alpha     = minutes > 0 ? 0.12 + intensity * 0.72 : 0
   const textColor = intensity > 0.45 ? '#fff' : '#4ade80'
 
   return (
     <td
-      className="border border-border/20 px-2 py-2.5 text-center text-xs font-semibold min-w-[56px]"
-      style={{ backgroundColor: `rgba(34,197,94,${alpha})`, color: textColor }}
+      className="border border-border/20 px-2 py-2 text-center text-xs min-w-[56px]"
+      style={{ backgroundColor: alpha > 0 ? `rgba(34,197,94,${alpha})` : undefined }}
     >
-      {fmtMinutes(minutes)}
+      {minutes > 0 && (
+        <div className="font-semibold" style={{ color: textColor }}>{fmtMinutes(minutes)}</div>
+      )}
+      {goalsTotal > 0 && (
+        <div className="text-[10px] text-muted/70 leading-tight">{goalsCompleted}/{goalsTotal} metas</div>
+      )}
+      {activitiesCount > 0 && (
+        <div className="text-[10px] text-muted/60 leading-tight">{activitiesCount} ativ.</div>
+      )}
     </td>
   )
 }
 
 export default function HistoryPage() {
-  const navigate   = useNavigate()
+  const navigate  = useNavigate()
   const [range, setRange] = useState('week')
 
   const { data: team = [], isLoading } = useQuery({
@@ -95,7 +115,7 @@ export default function HistoryPage() {
         </button>
         <div>
           <h1 className="text-xl font-bold text-white">Histórico do time</h1>
-          <p className="text-muted text-xs">Horas trabalhadas por membro</p>
+          <p className="text-muted text-xs">Horas trabalhadas, metas e atividades por membro</p>
         </div>
       </div>
 
@@ -145,7 +165,7 @@ export default function HistoryPage() {
             </thead>
             <tbody>
               {team.map(({ user, days }) => {
-                const total = Object.values(days).reduce((s, m) => s + m, 0)
+                const totalMinutes = Object.values(days).reduce((s, v) => s + (v.minutes || 0), 0)
                 return (
                   <tr key={user.id} className="hover:bg-white/[0.02]">
                     <td className="border-b border-r border-border/20 px-4 py-3 sticky left-0 bg-surface">
@@ -160,10 +180,10 @@ export default function HistoryPage() {
                       </div>
                     </td>
                     {dates.map(d => (
-                      <HeatCell key={d} minutes={days[d] || 0} />
+                      <HeatCell key={d} data={days[d]} />
                     ))}
                     <td className="border-b border-l border-border/20 px-3 py-3 text-center text-white text-xs font-semibold">
-                      {fmtMinutes(total) || '—'}
+                      {fmtMinutes(totalMinutes) || '—'}
                     </td>
                   </tr>
                 )
