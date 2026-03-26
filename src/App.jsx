@@ -1,8 +1,9 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
-import LoginPage    from './pages/LoginPage'
+import LoginPage     from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
-import TeamPage     from './pages/TeamPage'
-import HistoryPage  from './pages/HistoryPage'
+import TeamPage      from './pages/TeamPage'
+import HistoryPage   from './pages/HistoryPage'
+import LogPage       from './pages/LogPage'
 
 function RequireAuth({ children }) {
   return localStorage.getItem('pulse_token') ? children : <Navigate to="/login" replace />
@@ -14,6 +15,7 @@ export default function App() {
       <Route path="/login"     element={<LoginPage />} />
       <Route path="/team"      element={<TeamPage />} />
       <Route path="/history"   element={<HistoryPage />} />
+      <Route path="/log"       element={<LogPage />} />
       <Route path="/dashboard" element={<RequireAuth><DashboardPage /></RequireAuth>} />
       <Route path="*"          element={<Navigate to="/dashboard" replace />} />
     </Routes>

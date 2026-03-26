@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { sessionService, goalService, activityService } from '../services/api'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { LogIn, LogOut, Plus, Check, Trash2, Users, Clock, BarChart2 } from 'lucide-react'
+import { LogIn, LogOut, Plus, Check, Trash2, Users, Clock, BarChart2, BookOpen } from 'lucide-react'
 
 const VERTICALS = ['studio', 'originals', 'auto', 'agency', 'geral']
 const V_LABEL   = { studio: 'Studio', originals: 'Originals', auto: 'Auto', agency: 'Agency', geral: 'Geral' }
@@ -88,6 +88,9 @@ export default function DashboardPage() {
         <div className="flex items-center gap-2">
           <button onClick={() => navigate('/history')} className="btn-ghost text-xs gap-1.5">
             <BarChart2 size={14} /> Histórico
+          </button>
+          <button onClick={() => navigate('/log')} className="btn-ghost text-xs gap-1.5">
+            <BookOpen size={14} /> Registro
           </button>
           <button onClick={() => navigate('/team')} className="btn-ghost text-xs gap-1.5">
             <Users size={14} /> Time

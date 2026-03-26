@@ -36,4 +36,5 @@ export const activityService = {
 export const teamService = {
   today:   ()       => api.get('/team/today').then(r => r.data),
   history: (range)  => api.get(`/team/history?range=${range}`).then(r => r.data),
+  log:     (range)  => api.get(`/team/log?range=${range}`).then(r => r.data),
 }
