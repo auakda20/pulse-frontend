@@ -156,7 +156,7 @@ export default function DashboardPage() {
     const id = setInterval(() => {
       const minutesIn = Math.floor((Date.now() - new Date(openSession.checkinAt)) / 60000)
       const last = lastReminder.current
-      if (minutesIn > 0 && minutesIn % 90 === 0 && last !== minutesIn) {
+      if (minutesIn > 0 && minutesIn % 30 === 0 && last !== minutesIn) {
         playReminderSound()
         lastReminder.current = minutesIn
         toast('Lembrete: voce ainda esta em check-in', { icon: '🔔', duration: 5000 })
