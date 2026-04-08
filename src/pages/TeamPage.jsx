@@ -1,74 +1,86 @@
 import { useQuery } from '@tanstack/react-query'
 import { teamService } from '../services/api'
-import { useNavigate } from 'react-router-dom'
-import { Clock, Check, Target, Zap, BarChart2 } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { Clock, Check, Target, Zap } from 'lucide-react'
+import Layout from '../components/Layout'
 
 const V_LABEL = { studio: 'Studio', originals: 'Originals', auto: 'Auto', agency: 'Agency', geral: 'Geral' }
-const V_COLOR = { studio: 'bg-purple-500/10 text-purple-400 border-purple-500/20', originals: 'bg-blue-500/10 text-blue-400 border-blue-500/20', auto: 'bg-green/10 text-green border-green/20', agency: 'bg-yellow/10 text-yellow border-yellow/20', geral: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20' }
-
-function fmtMinutes(min) {
-  if (!min && min !== 0) return '—'
-  return `${Math.floor(min / 60)}h ${min % 60}min`
+const V_COLOR = {
+  studio:    'bg-violet/10 text-violet border-violet/20',
+  originals: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+  auto:      'bg-green/10 text-green border-green/20',
+  agency:    'bg-yellow/10 text-yellow border-yellow/20',
+  geral:     'bg-white/5 text-mutedLight border-borderLight',
 }
 
-function StatusDot({ session }) {
-  if (!session?.sessions?.length) return <span className="w-2 h-2 rounded-full bg-zinc-600 inline-block" />
-  if (session.openSession) return <span className="w-2 h-2 rounded-full bg-green inline-block animate-pulse" />
-  return <span className="w-2 h-2 rounded-full bg-yellow inline-block" />
+function fmtMinutes(min) {
+  if (!min && min !== 0) return '-'
+  return Math.floor(min / 60) + 'h ' + (min % 60) + 'min'
 }
 
 function fmtTime(iso) {
-  if (!iso) return '—'
-  return new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+  if (!iso) return '-'
+  return new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })
+}
+
+function StatusDot({ session }) {
+  if (!session?.sessions?.length) return <span className="w-2 h-2 rounded-full bg-border inline-block" />
+  if (session.openSession)        return <span className="w-2 h-2 rounded-full bg-green inline-block animate-pulse" />
+  return <span className="w-2 h-2 rounded-full bg-yellow inline-block" />
 }
 
 export default function TeamPage() {
-  const navigate = useNavigate()
+  const isAuth = !!localStorage.getItem('pulse_token')
+
   const { data: team = [], isLoading } = useQuery({
     queryKey:        ['team-today'],
     queryFn:         teamService.today,
     refetchInterval: 60000,
   })
 
-  return (
-    <div className="min-h-screen p-4 md:p-6 max-w-5xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-xl font-bold text-white flex items-center gap-2">⚡ Pulse <span className="text-muted font-normal text-base">— painel do time</span></h1>
-          <p className="text-muted text-xs mt-0.5">{new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button onClick={() => navigate('/history')} className="btn-ghost text-xs gap-1.5">
-            <BarChart2 size={14} /> Histórico
-          </button>
-          <button onClick={() => navigate('/login')} className="btn-outline text-xs">Meu dia →</button>
-        </div>
+  const nowSP = new Date().toLocaleDateString('pt-BR', {
+    timeZone: 'America/Sao_Paulo', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  })
+
+  const content = (
+    <div className="flex flex-col gap-5 pb-8">
+      <div>
+        <h1 className="text-xl font-semibold text-white">Time</h1>
+        <p className="text-mutedLight text-sm mt-0.5 capitalize">{nowSP}</p>
       </div>
 
-      {isLoading && <div className="text-muted text-sm text-center py-16 animate-pulse">Carregando...</div>}
+      {isLoading && (
+        <div className="text-muted text-sm text-center py-16 animate-pulse">Carregando...</div>
+      )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {team.map(({ user, session, goals, activities }) => {
           const completedGoals = goals.filter(g => g.completed).length
           const isOnline = !!session?.openSession
 
           return (
-            <div key={user.id} className={`card flex flex-col gap-4 ${isOnline ? 'border-green/20' : ''}`}>
-              {/* Pessoa */}
+            <motion.div
+              key={user.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={'card flex flex-col gap-4 ' + (isOnline ? 'border-green/20' : '')}
+            >
               <div className="flex items-center gap-3">
-                <div className="relative">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-base flex-shrink-0" style={{ backgroundColor: user.color }}>
+                <div className="relative flex-shrink-0">
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm"
+                    style={{ backgroundColor: user.color }}>
                     {user.name[0].toUpperCase()}
                   </div>
-                  <StatusDot session={session} />
+                  <span className="absolute -bottom-0.5 -right-0.5">
+                    <StatusDot session={session} />
+                  </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-white font-semibold text-sm">{user.name}</div>
+                  <div className="text-white font-medium text-sm">{user.name}</div>
                   <div className="text-muted text-xs flex items-center gap-1">
                     <Clock size={10} />
                     {session?.openSession
-                      ? `trabalhando desde ${fmtTime(session.openSession.checkinAt)}`
+                      ? 'desde ' + fmtTime(session.openSession.checkinAt)
                       : session?.totalMinutes
                         ? fmtMinutes(session.totalMinutes) + ' hoje'
                         : 'Sem check-in'}
@@ -76,7 +88,6 @@ export default function TeamPage() {
                 </div>
               </div>
 
-              {/* Metas */}
               {goals.length > 0 && (
                 <div>
                   <div className="flex items-center gap-1.5 text-xs text-muted mb-2">
@@ -86,18 +97,20 @@ export default function TeamPage() {
                   <div className="flex flex-col gap-1">
                     {goals.map(g => (
                       <div key={g.id} className="flex items-center gap-2">
-                        <div className={`w-3.5 h-3.5 rounded border flex items-center justify-center flex-shrink-0 ${g.completed ? 'bg-green border-green' : 'border-border'}`}>
+                        <div className={'w-3.5 h-3.5 rounded border flex items-center justify-center flex-shrink-0 ' +
+                          (g.completed ? 'bg-green border-green' : 'border-borderLight')}>
                           {g.completed && <Check size={8} className="text-white" />}
                         </div>
-                        <span className={`text-xs flex-1 truncate ${g.completed ? 'line-through text-muted' : 'text-white'}`}>{g.title}</span>
-                        <span className={`badge border text-xs flex-shrink-0 ${V_COLOR[g.vertical]}`}>{V_LABEL[g.vertical]}</span>
+                        <span className={'text-xs flex-1 truncate ' + (g.completed ? 'line-through text-muted' : 'text-white/90')}>
+                          {g.title}
+                        </span>
+                        <span className={'badge border text-xs flex-shrink-0 ' + V_COLOR[g.vertical]}>{V_LABEL[g.vertical]}</span>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Atividades */}
               {activities.length > 0 && (
                 <div>
                   <div className="flex items-center gap-1.5 text-xs text-muted mb-2">
@@ -108,8 +121,8 @@ export default function TeamPage() {
                     {activities.map(a => (
                       <div key={a.id}>
                         <div className="flex items-center gap-2">
-                          <span className="text-white text-xs flex-1 truncate">{a.title}</span>
-                          <span className={`badge border text-xs flex-shrink-0 ${V_COLOR[a.vertical]}`}>{V_LABEL[a.vertical]}</span>
+                          <span className="text-white/90 text-xs flex-1 truncate">{a.title}</span>
+                          <span className={'badge border text-xs flex-shrink-0 ' + V_COLOR[a.vertical]}>{V_LABEL[a.vertical]}</span>
                         </div>
                         {a.description && <p className="text-muted text-xs mt-0.5 truncate">{a.description}</p>}
                       </div>
@@ -119,12 +132,19 @@ export default function TeamPage() {
               )}
 
               {!session?.sessions?.length && goals.length === 0 && activities.length === 0 && (
-                <p className="text-muted text-xs text-center py-2">Nenhuma atividade hoje ainda</p>
+                <p className="text-muted text-xs text-center py-2">Nenhuma atividade hoje</p>
               )}
-            </div>
+            </motion.div>
           )
         })}
       </div>
+    </div>
+  )
+
+  if (isAuth) return <Layout>{content}</Layout>
+  return (
+    <div className="min-h-screen p-6 max-w-6xl mx-auto">
+      {content}
     </div>
   )
 }
