@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Users, BarChart2, BookOpen, FileText, LogOut, Zap } from 'lucide-react'
+import { LayoutDashboard, Users, BarChart2, BookOpen, FileText, LogOut } from 'lucide-react'
 
 const NAV = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Meu dia' },
@@ -24,11 +24,9 @@ export default function Sidebar() {
       style={{ boxShadow: '1px 0 0 rgba(255,255,255,0.03)' }}>
 
       {/* Logo */}
-      <div className="px-5 py-5 border-b border-border">
+      <div className="px-5 py-4 border-b border-border">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-            <Zap size={14} className="text-primary" />
-          </div>
+          <img src="/logo.png" alt="Pulse" className="w-8 h-8 object-contain" />
           <span className="text-white font-semibold text-sm tracking-tight">Pulse</span>
         </div>
       </div>

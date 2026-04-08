@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { authService } from '../services/api'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
-import { Zap } from 'lucide-react'
+
 
 export default function LoginPage() {
   const [email,    setEmail]    = useState('')
@@ -35,9 +35,8 @@ export default function LoginPage() {
         className="w-full max-w-sm"
       >
         <div className="text-center mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-4">
-            <Zap size={22} className="text-primary" />
-          </div>
+          <img src="/logo.png" alt="Pulse" className="w-16 h-16 object-contain mx-auto mb-4" />
+
           <h1 className="text-2xl font-semibold text-white tracking-tight">Pulse</h1>
           <p className="text-mutedLight text-sm mt-1">Daily tracker do time</p>
         </div>
