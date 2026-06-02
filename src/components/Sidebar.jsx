@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, FolderKanban, Users, BarChart2, BookOpen, FileText, Compass, UserCog, LogOut } from 'lucide-react'
+import { LayoutDashboard, FolderKanban, Users, BarChart2, BookOpen, FileText, Compass, UserCog, UsersRound, LogOut } from 'lucide-react'
 
 const NAV = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Meu dia' },
@@ -9,6 +9,7 @@ const NAV = [
   { to: '/log',       icon: BookOpen,         label: 'Registro' },
   { to: '/notes',     icon: FileText,         label: 'Notas' },
   { to: '/runbook',   icon: Compass,         label: 'Como Trabalhamos' },
+  { to: '/usuarios',  icon: UsersRound,      label: 'Usuários', admin: true },
   { to: '/perfil',    icon: UserCog,         label: 'Perfil' },
 ]
 
@@ -36,7 +37,7 @@ export default function Sidebar() {
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 flex flex-col gap-0.5 overflow-y-auto">
-        {NAV.map(({ to, icon: Icon, label }) => (
+        {NAV.filter(n => !n.admin || user.role === 'admin').map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
             to={to}

@@ -22,6 +22,14 @@ export const projectService = {
   remove: (id)       => api.delete('/projects/' + id).then(r => r.data),
 }
 
+export const userService = {
+  list:          ()             => api.get('/users').then(r => r.data),
+  create:        (body)         => api.post('/users', body).then(r => r.data),
+  update:        (id, body)     => api.put('/users/' + id, body).then(r => r.data),
+  resetPassword: (id, newPassword) => api.put('/users/' + id + '/password', { newPassword }).then(r => r.data),
+  remove:        (id)           => api.delete('/users/' + id).then(r => r.data),
+}
+
 export const sessionService = {
   checkin:  ()      => api.post('/sessions/checkin').then(r => r.data),
   checkout: ()      => api.post('/sessions/checkout').then(r => r.data),
