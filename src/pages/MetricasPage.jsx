@@ -22,7 +22,7 @@ function parseProjetos(s) { try { return JSON.parse(s || '[]') } catch { return 
 function sum(snap, key) { return parseProjetos(snap?.projetos).reduce((a, p) => a + (p[key] || 0), 0) }
 const isStudio = (n) => String(n || '').trim().toLowerCase() === 'studio'
 
-const ROW_VAZIA = { nome: '', mrr: 0, receita: 0, investido: 0, leads: 0, convertidos: 0, arrecadado: 0 }
+const ROW_VAZIA = { nome: '', mrr: 0, receita: 0, investido: 0, leads: 0, convertidos: 0, arrecadado: 0, freelas: [] }
 const PROJETOS_PADRAO = ['Kelsen', 'CasaPrime', 'Arbly', 'IA Contábil', 'STUDIO']
 
 export default function MetricasPage() {
@@ -38,6 +38,7 @@ export default function MetricasPage() {
       projetos: f.projetos.map(p => ({
         nome: p.nome, mrr: +p.mrr, receita: +p.receita, investido: +p.investido,
         leads: +p.leads, convertidos: +p.convertidos, arrecadado: +p.arrecadado,
+        freelas: (p.freelas || []).map(fr => ({ descricao: fr.descricao, valor: +fr.valor })),
       })),
     }),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['metrics'] }); setForm(null); toast.success('Mês salvo') },
@@ -211,6 +212,32 @@ export default function MetricasPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Freelance STUDIO */}
+              {(() => {
+                const studioProj = parseProjetos(latest.projetos).find(p => isStudio(p.nome))
+                const fre = studioProj?.freelas || []
+                return (
+                  <div className="card">
+                    <div className="flex items-center justify-between mb-3">
+                      <h2 className="text-ink font-semibold text-sm">Freelance · STUDIO</h2>
+                      <span className="text-muted text-xs">{fre.length} · {fmtBRL(fre.reduce((a, f) => a + (f.valor || 0), 0))}</span>
+                    </div>
+                    {fre.length === 0 ? (
+                      <p className="text-mutedLight text-xs">Nenhum trabalho avulso este mês.</p>
+                    ) : (
+                      <div className="flex flex-col gap-2">
+                        {fre.map((f, i) => (
+                          <div key={i} className="flex items-center justify-between text-sm border-b border-border/60 last:border-0 py-1">
+                            <span className="text-ink truncate pr-2">{f.descricao || 'Trabalho avulso'}</span>
+                            <span className="font-display font-bold text-ink flex-shrink-0">{fmtBRL(f.valor)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+              })()}
             </div>
           </div>
         </>
@@ -257,11 +284,35 @@ export default function MetricasPage() {
                           {isStudio(p.nome) && <>
                             <MiniField label="Investido"><input className="input text-xs py-1.5" type="number" value={p.investido} onChange={e => upd('investido', e.target.value)} /></MiniField>
                             <MiniField label="Leads"><input className="input text-xs py-1.5" type="number" value={p.leads} onChange={e => upd('leads', e.target.value)} /></MiniField>
-                            <MiniField label="Convertidos"><input className="input text-xs py-1.5" type="number" value={p.convertidos} onChange={e => upd('convertidos', e.target.value)} /></MiniField>
-                            <MiniField label="Arrecadado"><input className="input text-xs py-1.5" type="number" value={p.arrecadado} onChange={e => upd('arrecadado', e.target.value)} /></MiniField>
                           </>}
                         </div>
                         {!isStudio(p.nome) && <p className="text-mutedLight text-[10px] mt-1.5">Leads/investido/arrecadado são exclusivos do STUDIO.</p>}
+                        {isStudio(p.nome) && (() => {
+                          const fre = p.freelas || []
+                          const totFre = fre.reduce((a, f) => a + (+f.valor || 0), 0)
+                          return (
+                            <div className="mt-2 border-t border-border/60 pt-2">
+                              <div className="flex items-center justify-between mb-1.5">
+                                <span className="text-[10px] uppercase tracking-wider text-mutedLight">
+                                  Freelance · {fre.length} trabalho(s) · {fmtBRL(totFre)} <span className="normal-case">(= convertidos + arrecadado)</span>
+                                </span>
+                                <button onClick={() => upd('freelas', [...fre, { descricao: '', valor: 0 }])} className="text-xs text-primary flex items-center gap-1"><Plus size={11} /> trabalho</button>
+                              </div>
+                              <div className="flex flex-col gap-1.5">
+                                {fre.length === 0 && <p className="text-mutedLight text-[10px]">Nenhum freela este mês. Adicione conforme fecha trabalhos avulsos.</p>}
+                                {fre.map((f, fi) => (
+                                  <div key={fi} className="flex gap-2 items-center">
+                                    <input className="input text-xs py-1 flex-1" placeholder="Descrição do trabalho" value={f.descricao}
+                                      onChange={e => { const fs = [...fre]; fs[fi] = { ...fs[fi], descricao: e.target.value }; upd('freelas', fs) }} />
+                                    <input className="input text-xs py-1 w-24" type="number" placeholder="Valor" value={f.valor}
+                                      onChange={e => { const fs = [...fre]; fs[fi] = { ...fs[fi], valor: e.target.value }; upd('freelas', fs) }} />
+                                    <button onClick={() => upd('freelas', fre.filter((_, j) => j !== fi))} className="text-mutedLight hover:text-red"><Trash2 size={12} /></button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )
+                        })()}
                       </div>
                     )
                   })}
