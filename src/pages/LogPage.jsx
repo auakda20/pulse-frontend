@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { teamService } from '../services/api'
-import { Check } from 'lucide-react'
+import { Check, BookOpen } from 'lucide-react'
+import PageHeader from '../components/PageHeader'
 
 const RANGES = [
   { key: 'week',  label: 'Semana' },
@@ -14,7 +15,7 @@ const V_COLOR = {
   originals: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
   auto:      'bg-green/10 text-green border-green/20',
   agency:    'bg-yellow/10 text-yellow border-yellow/20',
-  geral:     'bg-white/5 text-mutedLight border-borderLight',
+  geral:     'bg-surfaceHover text-mutedLight border-borderLight',
 }
 const V_LABEL = { studio: 'Studio', originals: 'Originals', auto: 'Auto', agency: 'Agency', geral: 'Geral' }
 
@@ -34,10 +35,7 @@ export default function LogPage() {
 
   return (
     <div className="flex flex-col gap-5 pb-8">
-      <div>
-        <h1 className="text-xl font-semibold text-ink">Registro</h1>
-        <p className="text-mutedLight text-sm mt-0.5">Metas e atividades por dia</p>
-      </div>
+      <PageHeader title="Registro" subtitle="Metas e atividades por dia" icon={BookOpen} />
 
       <div className="flex gap-1 bg-surface border border-border rounded-lg p-1 w-fit">
         {RANGES.map(r => (

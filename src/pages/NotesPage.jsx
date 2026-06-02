@@ -5,7 +5,8 @@ import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Placeholder from '@tiptap/extension-placeholder'
 import { motion } from 'framer-motion'
-import { Bold, Italic, List, ListOrdered, Heading2, Minus, Save } from 'lucide-react'
+import { Bold, Italic, List, ListOrdered, Heading2, Minus, Save, FileText } from 'lucide-react'
+import PageHeader from '../components/PageHeader'
 
 function todaySP() {
   return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' })
@@ -87,25 +88,19 @@ export default function NotesPage() {
 
   return (
     <div className="flex flex-col gap-5 pb-8">
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-xl font-semibold text-ink">Notas do dia</h1>
-          <p className="text-mutedLight text-sm mt-0.5 capitalize">{fmtDateFull()}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          {saveMut.isPending && (
-            <span className="text-xs text-muted animate-pulse">Salvando...</span>
-          )}
-          {saveMut.isSuccess && !saveMut.isPending && (
-            <motion.span
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="text-xs text-green flex items-center gap-1"
-            >
-              <Save size={11} /> Salvo
-            </motion.span>
-          )}
-        </div>
-      </div>
+      <PageHeader title="Notas do dia" subtitle={fmtDateFull()} icon={FileText}>
+        {saveMut.isPending && (
+          <span className="text-xs text-muted animate-pulse">Salvando...</span>
+        )}
+        {saveMut.isSuccess && !saveMut.isPending && (
+          <motion.span
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="text-xs text-green flex items-center gap-1"
+          >
+            <Save size={11} /> Salvo
+          </motion.span>
+        )}
+      </PageHeader>
 
       <div className="card">
         {/* Toolbar */}

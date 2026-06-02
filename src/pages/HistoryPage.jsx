@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { teamService } from '../services/api'
+import { BarChart2 } from 'lucide-react'
+import PageHeader from '../components/PageHeader'
 
 const RANGES = [
   { key: 'week',  label: 'Semana' },
@@ -94,10 +96,7 @@ export default function HistoryPage() {
 
   return (
     <div className="flex flex-col gap-5 pb-8">
-      <div>
-        <h1 className="text-xl font-semibold text-ink">Historico</h1>
-        <p className="text-mutedLight text-sm mt-0.5">Horas trabalhadas, metas e atividades por membro</p>
-      </div>
+      <PageHeader title="Histórico" subtitle="Horas trabalhadas, metas e atividades por membro" icon={BarChart2} />
 
       <div className="flex gap-1 bg-surface border border-border rounded-lg p-1 w-fit">
         {RANGES.map(r => (

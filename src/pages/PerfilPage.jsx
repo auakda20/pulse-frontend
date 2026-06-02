@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { authService } from '../services/api'
 import toast from 'react-hot-toast'
 import { UserCog, Save } from 'lucide-react'
+import PageHeader from '../components/PageHeader'
 
 function currentUser() {
   try { return JSON.parse(localStorage.getItem('pulse_user') || '{}') } catch { return {} }
@@ -45,10 +46,7 @@ export default function PerfilPage() {
 
   return (
     <div className="flex flex-col gap-5 pb-8 max-w-lg">
-      <div className="flex items-center gap-2">
-        <UserCog size={20} className="text-primary" />
-        <h1 className="text-xl font-semibold text-ink">Perfil</h1>
-      </div>
+      <PageHeader title="Perfil" subtitle="Seus dados e segurança" icon={UserCog} />
 
       {/* Dados */}
       <div className="card flex flex-col gap-3">

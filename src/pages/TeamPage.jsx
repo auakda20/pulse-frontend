@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { teamService } from '../services/api'
 import { motion } from 'framer-motion'
-import { Clock, Check, Target, Zap } from 'lucide-react'
+import { Clock, Check, Target, Zap, Users } from 'lucide-react'
 import Layout from '../components/Layout'
+import PageHeader from '../components/PageHeader'
 
 const V_LABEL = { studio: 'Studio', originals: 'Originals', auto: 'Auto', agency: 'Agency', geral: 'Geral' }
 const V_COLOR = {
@@ -10,7 +11,7 @@ const V_COLOR = {
   originals: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
   auto:      'bg-green/10 text-green border-green/20',
   agency:    'bg-yellow/10 text-yellow border-yellow/20',
-  geral:     'bg-white/5 text-mutedLight border-borderLight',
+  geral:     'bg-surfaceHover text-mutedLight border-borderLight',
 }
 
 function fmtMinutes(min) {
@@ -44,10 +45,7 @@ export default function TeamPage() {
 
   const content = (
     <div className="flex flex-col gap-5 pb-8">
-      <div>
-        <h1 className="text-xl font-semibold text-ink">Time</h1>
-        <p className="text-mutedLight text-sm mt-0.5 capitalize">{nowSP}</p>
-      </div>
+      <PageHeader title="Time" subtitle={nowSP} icon={Users} />
 
       {isLoading && (
         <div className="text-muted text-sm text-center py-16 animate-pulse">Carregando...</div>

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { projectService } from '../services/api'
 import { Plus, Pencil, Trash2, Github, ExternalLink, FileText, X, FolderKanban } from 'lucide-react'
+import PageHeader from '../components/PageHeader'
 
 const VERTICAIS = [{ key: 'auto', label: 'AUTO' }, { key: 'studio', label: 'STUDIO' }]
 const STATUS = {
@@ -46,18 +47,14 @@ export default function ProjectsPage() {
 
   return (
     <div className="flex flex-col gap-5 pb-8">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <FolderKanban size={20} className="text-primary" />
-          <h1 className="text-xl font-semibold text-ink">Projetos</h1>
-        </div>
+      <PageHeader title="Projetos" subtitle="Todas as ventures num lugar" icon={FolderKanban}>
         {isAdmin && (
           <button onClick={() => setForm({ ...VAZIO })}
             className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded bg-primary/10 text-primary hover:bg-primary/20 transition-all">
             <Plus size={14} /> Novo projeto
           </button>
         )}
-      </div>
+      </PageHeader>
 
       {VERTICAIS.map(v => {
         const itens = projects.filter(p => p.vertical === v.key)

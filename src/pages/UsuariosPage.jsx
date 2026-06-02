@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { userService } from '../services/api'
 import toast from 'react-hot-toast'
 import { UsersRound, Plus, Pencil, Trash2, KeyRound, X } from 'lucide-react'
+import PageHeader from '../components/PageHeader'
 
 const NOVO = { name: '', email: '', password: '', role: 'member', color: '#10b981' }
 
@@ -43,16 +44,12 @@ export default function UsuariosPage() {
 
   return (
     <div className="flex flex-col gap-5 pb-8 max-w-2xl">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <UsersRound size={20} className="text-primary" />
-          <h1 className="text-xl font-semibold text-ink">Usuários</h1>
-        </div>
+      <PageHeader title="Usuários" subtitle="Gestão de acesso da equipe" icon={UsersRound}>
         <button onClick={() => setForm({ ...NOVO })}
           className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded bg-primary/10 text-primary hover:bg-primary/20 transition-all">
           <Plus size={14} /> Novo usuário
         </button>
-      </div>
+      </PageHeader>
 
       <div className="card divide-y divide-border/50 p-0">
         {users.map(u => (
