@@ -52,6 +52,8 @@ export default function MetricasPage() {
   const receita    = sum(latest, 'receita')
   const runway = latest && latest.gastos > 0 ? (latest.caixa / latest.gastos) : null
   const convPct = leads > 0 ? Math.round((convert / leads) * 100) : 0
+  const cacEmpresa = convert > 0 ? investido / convert : null
+  const roiEmpresa = investido > 0 ? ((arrecadado - investido) / investido) * 100 : null
   const maxMrr = useMemo(() => Math.max(1, ...snaps.map(s => sum(s, 'mrr'))), [snaps])
   const kConv = latest && latest.kelsenTestando > 0 ? Math.round((latest.kelsenPagantes / latest.kelsenTestando) * 100) : 0
 
@@ -104,6 +106,26 @@ export default function MetricasPage() {
             <StatCard icon={Users2}    label="Leads"            value={leads} />
             <StatCard icon={UserCheck} label="Leads convertidos" value={convert} sub={convPct + '%'} tone="green" />
             <StatCard icon={Coins} label="Valor arrecadado" value={fmtBRL(arrecadado)} tone="green" />
+          </div>
+
+          {/* Resultado — CAC e ROI da empresa (destaque) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="card-sm flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0"><Banknote size={22} /></div>
+              <div>
+                <div className="font-display text-3xl font-bold text-ink leading-none tracking-tight">{cacEmpresa != null ? fmtBRL(cacEmpresa) : '—'}</div>
+                <div className="text-muted text-xs mt-1">CAC médio da empresa <span className="text-mutedLight">· investido ÷ convertidos</span></div>
+              </div>
+            </div>
+            <div className="card-sm flex items-center gap-4">
+              <div className={'w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ' + (roiEmpresa == null ? 'bg-surfaceHover text-muted' : roiEmpresa >= 0 ? 'bg-green/10 text-green' : 'bg-red/10 text-red')}><TrendingUp size={22} /></div>
+              <div>
+                <div className={'font-display text-3xl font-bold leading-none tracking-tight ' + (roiEmpresa == null ? 'text-ink' : roiEmpresa >= 0 ? 'text-green' : 'text-red')}>
+                  {roiEmpresa != null ? (roiEmpresa >= 0 ? '+' : '') + Math.round(roiEmpresa) + '%' : '—'}
+                </div>
+                <div className="text-muted text-xs mt-1">ROI da empresa <span className="text-mutedLight">· (arrecadado − investido) ÷ investido</span></div>
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
