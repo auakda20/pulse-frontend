@@ -20,6 +20,7 @@ function mesLabel(mes) {
 }
 function parseProjetos(s) { try { return JSON.parse(s || '[]') } catch { return [] } }
 function sum(snap, key) { return parseProjetos(snap?.projetos).reduce((a, p) => a + (p[key] || 0), 0) }
+const isStudio = (n) => String(n || '').trim().toLowerCase() === 'studio'
 
 const ROW_VAZIA = { nome: '', mrr: 0, receita: 0, investido: 0, leads: 0, convertidos: 0, arrecadado: 0 }
 const PROJETOS_PADRAO = ['Kelsen', 'CasaPrime', 'Arbly', 'IA Contábil', 'STUDIO']
@@ -114,7 +115,7 @@ export default function MetricasPage() {
               <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0"><Banknote size={22} /></div>
               <div>
                 <div className="font-display text-3xl font-bold text-ink leading-none tracking-tight">{cacEmpresa != null ? fmtBRL(cacEmpresa) : '—'}</div>
-                <div className="text-muted text-xs mt-1">CAC médio da empresa <span className="text-mutedLight">· investido ÷ convertidos</span></div>
+                <div className="text-muted text-xs mt-1">CAC médio · STUDIO <span className="text-mutedLight">· investido ÷ convertidos</span></div>
               </div>
             </div>
             <div className="card-sm flex items-center gap-4">
@@ -123,7 +124,7 @@ export default function MetricasPage() {
                 <div className={'font-display text-3xl font-bold leading-none tracking-tight ' + (roiEmpresa == null ? 'text-ink' : roiEmpresa >= 0 ? 'text-green' : 'text-red')}>
                   {roiEmpresa != null ? (roiEmpresa >= 0 ? '+' : '') + Math.round(roiEmpresa) + '%' : '—'}
                 </div>
-                <div className="text-muted text-xs mt-1">ROI da empresa <span className="text-mutedLight">· (arrecadado − investido) ÷ investido</span></div>
+                <div className="text-muted text-xs mt-1">ROI · STUDIO <span className="text-mutedLight">· (arrecadado − investido) ÷ investido</span></div>
               </div>
             </div>
           </div>
@@ -148,16 +149,17 @@ export default function MetricasPage() {
                   </thead>
                   <tbody>
                     {parseProjetos(latest.projetos).map((p, i) => {
-                      const cac = p.convertidos > 0 ? p.investido / p.convertidos : null
-                      const roi = p.investido > 0 ? ((p.arrecadado - p.investido) / p.investido) * 100 : null
+                      const studio = isStudio(p.nome)
+                      const cac = studio && p.convertidos > 0 ? p.investido / p.convertidos : null
+                      const roi = studio && p.investido > 0 ? ((p.arrecadado - p.investido) / p.investido) * 100 : null
                       return (
                       <tr key={i} className="border-t border-border/60">
                         <td className="text-ink py-2">{p.nome}</td>
                         <td className="text-right text-ink py-2">{fmtBRL(p.mrr)}</td>
-                        <td className="text-right text-muted py-2">{fmtBRL(p.investido)}</td>
-                        <td className="text-right text-muted py-2">{p.leads || 0}</td>
-                        <td className="text-right text-muted py-2">{p.convertidos || 0}</td>
-                        <td className="text-right text-ink py-2">{fmtBRL(p.arrecadado)}</td>
+                        <td className="text-right text-muted py-2">{studio ? fmtBRL(p.investido) : '—'}</td>
+                        <td className="text-right text-muted py-2">{studio ? (p.leads || 0) : '—'}</td>
+                        <td className="text-right text-muted py-2">{studio ? (p.convertidos || 0) : '—'}</td>
+                        <td className="text-right text-ink py-2">{studio ? fmtBRL(p.arrecadado) : '—'}</td>
                         <td className="text-right text-muted py-2">{cac != null ? fmtBRL(cac) : '—'}</td>
                         <td className={'text-right py-2 font-medium ' + (roi == null ? 'text-mutedLight' : roi >= 0 ? 'text-green' : 'text-red')}>
                           {roi != null ? (roi >= 0 ? '+' : '') + Math.round(roi) + '%' : '—'}
@@ -252,11 +254,14 @@ export default function MetricasPage() {
                         <div className="grid grid-cols-3 gap-2">
                           <MiniField label="MRR"><input className="input text-xs py-1.5" type="number" value={p.mrr} onChange={e => upd('mrr', e.target.value)} /></MiniField>
                           <MiniField label="Receita"><input className="input text-xs py-1.5" type="number" value={p.receita} onChange={e => upd('receita', e.target.value)} /></MiniField>
-                          <MiniField label="Investido"><input className="input text-xs py-1.5" type="number" value={p.investido} onChange={e => upd('investido', e.target.value)} /></MiniField>
-                          <MiniField label="Leads"><input className="input text-xs py-1.5" type="number" value={p.leads} onChange={e => upd('leads', e.target.value)} /></MiniField>
-                          <MiniField label="Convertidos"><input className="input text-xs py-1.5" type="number" value={p.convertidos} onChange={e => upd('convertidos', e.target.value)} /></MiniField>
-                          <MiniField label="Arrecadado"><input className="input text-xs py-1.5" type="number" value={p.arrecadado} onChange={e => upd('arrecadado', e.target.value)} /></MiniField>
+                          {isStudio(p.nome) && <>
+                            <MiniField label="Investido"><input className="input text-xs py-1.5" type="number" value={p.investido} onChange={e => upd('investido', e.target.value)} /></MiniField>
+                            <MiniField label="Leads"><input className="input text-xs py-1.5" type="number" value={p.leads} onChange={e => upd('leads', e.target.value)} /></MiniField>
+                            <MiniField label="Convertidos"><input className="input text-xs py-1.5" type="number" value={p.convertidos} onChange={e => upd('convertidos', e.target.value)} /></MiniField>
+                            <MiniField label="Arrecadado"><input className="input text-xs py-1.5" type="number" value={p.arrecadado} onChange={e => upd('arrecadado', e.target.value)} /></MiniField>
+                          </>}
                         </div>
+                        {!isStudio(p.nome) && <p className="text-mutedLight text-[10px] mt-1.5">Leads/investido/arrecadado são exclusivos do STUDIO.</p>}
                       </div>
                     )
                   })}
