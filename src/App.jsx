@@ -6,6 +6,7 @@ import TeamPage      from './pages/TeamPage'
 import HistoryPage   from './pages/HistoryPage'
 import LogPage       from './pages/LogPage'
 import NotesPage     from './pages/NotesPage'
+import RunbookPage   from './pages/RunbookPage'
 
 function RequireAuth({ children }) {
   return localStorage.getItem('pulse_token')
@@ -22,6 +23,7 @@ export default function App() {
       <Route path="/history"   element={<RequireAuth><HistoryPage /></RequireAuth>} />
       <Route path="/log"       element={<RequireAuth><LogPage /></RequireAuth>} />
       <Route path="/notes"     element={<RequireAuth><NotesPage /></RequireAuth>} />
+      <Route path="/runbook"   element={<RequireAuth><RunbookPage /></RequireAuth>} />
       <Route path="*"          element={<Navigate to="/dashboard" replace />} />
     </Routes>
   )

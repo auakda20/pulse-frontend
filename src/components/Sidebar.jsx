@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Users, BarChart2, BookOpen, FileText, LogOut } from 'lucide-react'
+import { LayoutDashboard, Users, BarChart2, BookOpen, FileText, Compass, LogOut } from 'lucide-react'
 
 const NAV = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Meu dia' },
@@ -7,6 +7,7 @@ const NAV = [
   { to: '/history',   icon: BarChart2,        label: 'Histórico' },
   { to: '/log',       icon: BookOpen,         label: 'Registro' },
   { to: '/notes',     icon: FileText,         label: 'Notas' },
+  { to: '/runbook',   icon: Compass,         label: 'Como Trabalhamos' },
 ]
 
 export default function Sidebar() {

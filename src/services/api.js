@@ -44,3 +44,11 @@ export const noteService = {
   today: (date) => api.get('/notes/today' + (date ? '?date=' + date : '')).then(r => r.data),
   save:  (content, date) => api.put('/notes/today', { content, date }).then(r => r.data),
 }
+
+export const runbookService = {
+  list:   (vertical) => api.get('/runbook' + (vertical ? '?vertical=' + vertical : '')).then(r => r.data),
+  get:    (slug)     => api.get('/runbook/' + slug).then(r => r.data),
+  create: (body)     => api.post('/runbook', body).then(r => r.data),
+  update: (id, body) => api.put('/runbook/' + id, body).then(r => r.data),
+  remove: (id)       => api.delete('/runbook/' + id).then(r => r.data),
+}
