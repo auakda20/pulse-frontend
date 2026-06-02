@@ -7,6 +7,7 @@ import Placeholder from '@tiptap/extension-placeholder'
 import {
   Bold, Italic, List, ListOrdered, Heading2, Minus, Save, Pencil, Plus, Trash2, Compass,
 } from 'lucide-react'
+import PageHeader from '../components/PageHeader'
 
 const VERTICAIS = [
   { key: 'auto',   label: 'AUTO' },
@@ -101,13 +102,11 @@ export default function RunbookPage() {
   if (!editor) return null
 
   return (
-    <div className="flex gap-6 pb-8">
+    <div className="flex flex-col gap-5 pb-8">
+      <PageHeader title="Como Trabalhamos" subtitle="Processos e rituais do time" icon={Compass} />
+      <div className="flex gap-6">
       {/* ── Navegação lateral interna ── */}
       <div className="w-56 flex-shrink-0">
-        <div className="flex items-center gap-2 mb-4">
-          <Compass size={18} className="text-primary" />
-          <h1 className="text-base font-semibold text-ink">Como Trabalhamos</h1>
-        </div>
 
         {VERTICAIS.map(v => {
           const doVertical = pages.filter(p => p.vertical === v.key)
@@ -202,6 +201,7 @@ export default function RunbookPage() {
             )}
           </>
         )}
+      </div>
       </div>
     </div>
   )
