@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { teamService } from '../services/api'
-import { BarChart2 } from 'lucide-react'
+import { BarChart2, Clock, Target, Zap, TrendingUp } from 'lucide-react'
 import PageHeader from '../components/PageHeader'
+import StatCard from '../components/StatCard'
 
 const RANGES = [
   { key: 'week',  label: 'Semana' },
@@ -94,6 +95,14 @@ export default function HistoryPage() {
 
   const dates = getDates(range)
 
+  const agg = team.reduce((a, m) => {
+    Object.values(m.days || {}).forEach(d => {
+      a.min += d.minutes || 0; a.gd += d.goalsCompleted || 0; a.gt += d.goalsTotal || 0; a.act += d.activitiesCount || 0
+    })
+    return a
+  }, { min: 0, gd: 0, gt: 0, act: 0 })
+  const mediaDia = dates.length ? Math.round(agg.min / dates.length) : 0
+
   return (
     <div className="flex flex-col gap-5 pb-8">
       <PageHeader title="Histórico" subtitle="Horas trabalhadas, metas e atividades por membro" icon={BarChart2} />
@@ -107,6 +116,15 @@ export default function HistoryPage() {
           </button>
         ))}
       </div>
+
+      {!isLoading && team.length > 0 && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <StatCard icon={Clock}      label="Total de horas"     value={fmtMinutes(agg.min) || '0h'} />
+          <StatCard icon={Target}     label="Metas concluídas"   value={`${agg.gd}/${agg.gt}`} />
+          <StatCard icon={Zap}        label="Atividades"         value={agg.act} />
+          <StatCard icon={TrendingUp} label="Média/dia (time)"   value={fmtMinutes(mediaDia) || '0h'} />
+        </div>
+      )}
 
       {isLoading && <div className="text-muted text-sm text-center py-16 animate-pulse">Carregando...</div>}
       {!isLoading && team.length === 0 && <div className="text-muted text-sm text-center py-16">Nenhum dado encontrado.</div>}

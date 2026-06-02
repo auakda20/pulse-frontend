@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { Clock, Check, Target, Zap, Users } from 'lucide-react'
 import Layout from '../components/Layout'
 import PageHeader from '../components/PageHeader'
+import StatCard from '../components/StatCard'
 
 const V_LABEL = { studio: 'Studio', originals: 'Originals', auto: 'Auto', agency: 'Agency', geral: 'Geral' }
 const V_COLOR = {
@@ -43,9 +44,24 @@ export default function TeamPage() {
     timeZone: 'America/Sao_Paulo', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
   })
 
+  const online   = team.filter(m => m.session?.openSession).length
+  const teamMin  = team.reduce((s, m) => s + (m.session?.totalMinutes || 0), 0)
+  const gDone    = team.reduce((s, m) => s + m.goals.filter(g => g.completed).length, 0)
+  const gTot     = team.reduce((s, m) => s + m.goals.length, 0)
+  const actCount = team.reduce((s, m) => s + m.activities.length, 0)
+
   const content = (
     <div className="flex flex-col gap-5 pb-8">
       <PageHeader title="Time" subtitle={nowSP} icon={Users} />
+
+      {team.length > 0 && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <StatCard icon={Users}  label="Online agora"        value={`${online}/${team.length}`} tone={online ? 'green' : 'muted'} />
+          <StatCard icon={Clock}  label="Horas do time hoje"  value={fmtMinutes(teamMin)} />
+          <StatCard icon={Target} label="Metas concluídas"    value={`${gDone}/${gTot}`} />
+          <StatCard icon={Zap}    label="Atividades hoje"     value={actCount} />
+        </div>
+      )}
 
       {isLoading && (
         <div className="text-muted text-sm text-center py-16 animate-pulse">Carregando...</div>
