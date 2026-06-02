@@ -62,6 +62,11 @@ export const noteService = {
   save:  (content, date) => api.put('/notes/today', { content, date }).then(r => r.data),
 }
 
+export const pendenciaService = {
+  list:   ()              => api.get('/pendencias').then(r => r.data),
+  toggle: (id, done, doneBy) => api.patch('/pendencias/' + id, { done, doneBy }).then(r => r.data),
+}
+
 export const runbookService = {
   list:   (vertical) => api.get('/runbook' + (vertical ? '?vertical=' + vertical : '')).then(r => r.data),
   get:    (slug)     => api.get('/runbook/' + slug).then(r => r.data),
