@@ -120,10 +120,15 @@ export default function MetricasPage() {
                       <th className="text-right font-medium py-1.5">Leads</th>
                       <th className="text-right font-medium py-1.5">Conv.</th>
                       <th className="text-right font-medium py-1.5">Arrecadado</th>
+                      <th className="text-right font-medium py-1.5" title="Custo por aquisição = investido ÷ convertidos">CAC</th>
+                      <th className="text-right font-medium py-1.5" title="Retorno = (arrecadado − investido) ÷ investido">ROI</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {parseProjetos(latest.projetos).map((p, i) => (
+                    {parseProjetos(latest.projetos).map((p, i) => {
+                      const cac = p.convertidos > 0 ? p.investido / p.convertidos : null
+                      const roi = p.investido > 0 ? ((p.arrecadado - p.investido) / p.investido) * 100 : null
+                      return (
                       <tr key={i} className="border-t border-border/60">
                         <td className="text-ink py-2">{p.nome}</td>
                         <td className="text-right text-ink py-2">{fmtBRL(p.mrr)}</td>
@@ -131,10 +136,15 @@ export default function MetricasPage() {
                         <td className="text-right text-muted py-2">{p.leads || 0}</td>
                         <td className="text-right text-muted py-2">{p.convertidos || 0}</td>
                         <td className="text-right text-ink py-2">{fmtBRL(p.arrecadado)}</td>
+                        <td className="text-right text-muted py-2">{cac != null ? fmtBRL(cac) : '—'}</td>
+                        <td className={'text-right py-2 font-medium ' + (roi == null ? 'text-mutedLight' : roi >= 0 ? 'text-green' : 'text-red')}>
+                          {roi != null ? (roi >= 0 ? '+' : '') + Math.round(roi) + '%' : '—'}
+                        </td>
                       </tr>
-                    ))}
+                      )
+                    })}
                     {parseProjetos(latest.projetos).length === 0 && (
-                      <tr><td colSpan={6} className="text-mutedLight text-xs text-center py-4">Nenhum projeto no snapshot.</td></tr>
+                      <tr><td colSpan={8} className="text-mutedLight text-xs text-center py-4">Nenhum projeto no snapshot.</td></tr>
                     )}
                   </tbody>
                 </table>
