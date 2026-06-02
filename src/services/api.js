@@ -67,6 +67,12 @@ export const pendenciaService = {
   toggle: (id, done, doneBy) => api.patch('/pendencias/' + id, { done, doneBy }).then(r => r.data),
 }
 
+export const metricService = {
+  list:   ()           => api.get('/metrics').then(r => r.data),
+  save:   (mes, data)  => api.put('/metrics/' + mes, data).then(r => r.data),
+  remove: (mes)        => api.delete('/metrics/' + mes).then(r => r.data),
+}
+
 export const runbookService = {
   list:   (vertical) => api.get('/runbook' + (vertical ? '?vertical=' + vertical : '')).then(r => r.data),
   get:    (slug)     => api.get('/runbook/' + slug).then(r => r.data),
