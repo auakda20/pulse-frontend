@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -10,24 +10,30 @@
 }
 
 body {
-  background-color: #08090a;
-  color: #e4e5e7;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: #F6F9FB;   /* n-50 */
+  color: #0A2540;              /* navy-900 · ink */
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-::-webkit-scrollbar { width: 4px; height: 4px; }
+/* Títulos e números em Space Grotesk */
+h1, h2, h3, h4, .font-display {
+  font-family: 'Space Grotesk', 'Manrope', sans-serif;
+  letter-spacing: -0.01em;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #1c1e22; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #242629; }
+::-webkit-scrollbar-thumb { background: #CAD5E0; border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: #98A6B8; }
 
 @layer components {
   .card {
     @apply bg-surface border border-border rounded-2xl p-5;
-    box-shadow: 0 0 0 1px rgba(255,255,255,0.03), 0 4px 24px rgba(0,0,0,0.3);
+    box-shadow: 0 1px 2px rgba(10,37,64,0.04), 0 4px 16px rgba(10,37,64,0.06);
   }
   .card-sm {
     @apply bg-surface border border-border rounded-xl p-4;
-    box-shadow: 0 0 0 1px rgba(255,255,255,0.03);
+    box-shadow: 0 1px 2px rgba(10,37,64,0.04);
   }
 
   .btn {
@@ -35,21 +41,20 @@ body {
   }
   .btn-primary {
     @apply btn bg-primary hover:bg-primaryHover text-white;
-    box-shadow: 0 0 16px rgba(99,102,241,0.2);
+    box-shadow: 0 1px 2px rgba(10,37,64,0.08), 0 0 16px rgba(42,155,216,0.18);
   }
   .btn-outline {
-    @apply btn border border-border text-mutedLight hover:text-white hover:border-borderLight hover:bg-surfaceHover;
+    @apply btn border border-border text-muted hover:text-ink hover:border-borderLight hover:bg-surfaceHover;
   }
   .btn-ghost {
-    @apply btn text-muted hover:text-white hover:bg-surfaceHover;
+    @apply btn text-muted hover:text-ink hover:bg-surfaceHover;
   }
   .btn-danger {
-    @apply btn text-red/60 hover:text-red hover:bg-red/5;
+    @apply btn text-red/80 hover:text-red hover:bg-red/5;
   }
 
   .input {
-    @apply w-full bg-bg border border-border rounded-lg px-3 py-2 text-sm text-white placeholder:text-muted focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all;
-    background-color: #08090a;
+    @apply w-full bg-surface border border-border rounded-lg px-3 py-2 text-sm text-ink placeholder:text-mutedLight focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/15 transition-all;
   }
 
   .badge {
@@ -57,29 +62,28 @@ body {
   }
 
   .nav-item {
-    @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer text-muted hover:text-white hover:bg-surfaceHover;
+    @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer text-muted hover:text-ink hover:bg-surfaceHover;
   }
   .nav-item.active {
-    @apply text-white bg-surfaceHover;
+    @apply text-primary bg-primary/10;
   }
 
   .tiptap {
-    @apply outline-none min-h-[200px] text-sm leading-relaxed;
-    color: rgba(228, 229, 231, 0.9);
+    @apply outline-none min-h-[200px] text-sm leading-relaxed text-ink/90;
   }
   .tiptap p { @apply mb-2; }
-  .tiptap h1 { @apply text-xl font-bold mb-3 text-white; }
-  .tiptap h2 { @apply text-lg font-semibold mb-2 text-white; }
-  .tiptap h3 { @apply text-base font-semibold mb-2 text-white; }
+  .tiptap h1 { @apply text-xl font-bold mb-3 text-ink; }
+  .tiptap h2 { @apply text-lg font-semibold mb-2 text-ink; }
+  .tiptap h3 { @apply text-base font-semibold mb-2 text-ink; }
   .tiptap ul { @apply list-disc list-inside mb-2 space-y-1; }
   .tiptap ol { @apply list-decimal list-inside mb-2 space-y-1; }
-  .tiptap strong { @apply font-semibold text-white; }
+  .tiptap strong { @apply font-semibold text-ink; }
   .tiptap em { @apply italic; }
-  .tiptap blockquote { @apply border-l-2 border-primary/40 pl-4 italic; color: #6b6f78; }
-  .tiptap code { background: rgba(255,255,255,0.05); @apply rounded px-1 py-0.5 text-xs font-mono text-violet; }
+  .tiptap blockquote { @apply border-l-2 border-primary/40 pl-4 italic; color: #697787; }
+  .tiptap code { background: #EEF2F6; @apply rounded px-1 py-0.5 text-xs font-mono text-violet; }
   .tiptap p.is-editor-empty:first-child::before {
     content: attr(data-placeholder);
-    color: #52555c;
+    color: #98A6B8;
     pointer-events: none;
     float: left;
     height: 0;

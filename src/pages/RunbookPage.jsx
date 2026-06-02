@@ -25,7 +25,7 @@ function ToolbarBtn({ onClick, active, children, title }) {
   return (
     <button onClick={onClick} title={title}
       className={'p-1.5 rounded transition-all ' + (active
-        ? 'bg-primary/10 text-primary' : 'text-muted hover:text-white hover:bg-surfaceHover')}>
+        ? 'bg-primary/10 text-primary' : 'text-muted hover:text-ink hover:bg-surfaceHover')}>
       {children}
     </button>
   )
@@ -106,7 +106,7 @@ export default function RunbookPage() {
       <div className="w-56 flex-shrink-0">
         <div className="flex items-center gap-2 mb-4">
           <Compass size={18} className="text-primary" />
-          <h1 className="text-base font-semibold text-white">Como Trabalhamos</h1>
+          <h1 className="text-base font-semibold text-ink">Como Trabalhamos</h1>
         </div>
 
         {VERTICAIS.map(v => {
@@ -123,7 +123,7 @@ export default function RunbookPage() {
                     {itens.map(p => (
                       <button key={p.id} onClick={() => setSelectedId(p.id)}
                         className={'w-full text-left text-sm px-2 py-1.5 rounded transition-all truncate ' +
-                          (p.id === selectedId ? 'bg-primary/10 text-primary' : 'text-mutedLight hover:text-white hover:bg-surfaceHover')}>
+                          (p.id === selectedId ? 'bg-primary/10 text-primary' : 'text-mutedLight hover:text-ink hover:bg-surfaceHover')}>
                         {p.titulo}
                       </button>
                     ))}
@@ -135,7 +135,7 @@ export default function RunbookPage() {
         })}
 
         {isAdmin && (
-          <button onClick={novaPagina} className="nav-item w-full text-muted hover:text-white mt-2">
+          <button onClick={novaPagina} className="nav-item w-full text-muted hover:text-ink mt-2">
             <Plus size={15} /> <span>Nova página</span>
           </button>
         )}
@@ -153,7 +153,7 @@ export default function RunbookPage() {
           <>
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h2 className="text-xl font-semibold text-white">{selected.titulo}</h2>
+                <h2 className="text-xl font-semibold text-ink">{selected.titulo}</h2>
                 <p className="text-muted text-xs mt-0.5">
                   {VERTICAIS.find(v => v.key === selected.vertical)?.label} ·{' '}
                   {CATS.find(c => c.key === selected.categoria)?.label}
@@ -168,7 +168,7 @@ export default function RunbookPage() {
                     </button>
                   ) : (
                     <button onClick={startEdit}
-                      className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded text-muted hover:text-white hover:bg-surfaceHover transition-all">
+                      className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded text-muted hover:text-ink hover:bg-surfaceHover transition-all">
                       <Pencil size={13} /> Editar
                     </button>
                   )}

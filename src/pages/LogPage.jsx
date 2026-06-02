@@ -35,7 +35,7 @@ export default function LogPage() {
   return (
     <div className="flex flex-col gap-5 pb-8">
       <div>
-        <h1 className="text-xl font-semibold text-white">Registro</h1>
+        <h1 className="text-xl font-semibold text-ink">Registro</h1>
         <p className="text-mutedLight text-sm mt-0.5">Metas e atividades por dia</p>
       </div>
 
@@ -43,7 +43,7 @@ export default function LogPage() {
         {RANGES.map(r => (
           <button key={r.key} onClick={() => setRange(r.key)}
             className={'px-4 py-1.5 rounded text-sm font-medium transition-all ' +
-              (range === r.key ? 'bg-primary/10 text-primary' : 'text-muted hover:text-white')}>
+              (range === r.key ? 'bg-primary/10 text-primary' : 'text-muted hover:text-ink')}>
             {r.label}
           </button>
         ))}
@@ -55,7 +55,7 @@ export default function LogPage() {
       <div className="flex flex-col gap-6">
         {days.map(({ date, members }) => (
           <div key={date}>
-            <div className="text-white font-medium text-sm capitalize mb-3 flex items-center gap-3">
+            <div className="text-ink font-medium text-sm capitalize mb-3 flex items-center gap-3">
               <span>{fmtDate(date)}</span>
               <span className="h-px flex-1 bg-border/40" />
             </div>
@@ -71,7 +71,7 @@ export default function LogPage() {
                         style={{ backgroundColor: user.color }}>
                         {user.name[0].toUpperCase()}
                       </div>
-                      <span className="text-white text-sm font-medium">{user.name}</span>
+                      <span className="text-ink text-sm font-medium">{user.name}</span>
                     </div>
 
                     {goals.length > 0 && (
@@ -84,9 +84,9 @@ export default function LogPage() {
                             <div key={g.id} className="flex items-center gap-2">
                               <div className={'w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 ' +
                                 (g.completed ? 'bg-green border-green' : 'border-borderLight')}>
-                                {g.completed && <Check size={10} className="text-white" />}
+                                {g.completed && <Check size={10} className="text-ink" />}
                               </div>
-                              <span className={'text-sm flex-1 ' + (g.completed ? 'line-through text-muted' : 'text-white/90')}>
+                              <span className={'text-sm flex-1 ' + (g.completed ? 'line-through text-muted' : 'text-ink/90')}>
                                 {g.title}
                               </span>
                               <span className={'badge border text-xs ' + V_COLOR[g.vertical]}>{V_LABEL[g.vertical]}</span>
@@ -107,7 +107,7 @@ export default function LogPage() {
                               <span className="w-1 h-1 rounded-full bg-muted/40 mt-2 flex-shrink-0" />
                               <div className="flex-1">
                                 <div className="flex items-center gap-2">
-                                  <span className="text-white/90 text-sm">{a.title}</span>
+                                  <span className="text-ink/90 text-sm">{a.title}</span>
                                   <span className={'badge border text-xs ' + V_COLOR[a.vertical]}>{V_LABEL[a.vertical]}</span>
                                 </div>
                                 {a.description && <p className="text-muted text-xs mt-0.5">{a.description}</p>}

@@ -37,7 +37,7 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <img src="/logo.png" alt="Pulse" className="w-16 h-16 object-contain mx-auto mb-4" />
 
-          <h1 className="text-2xl font-semibold text-white tracking-tight">Pulse</h1>
+          <h1 className="text-2xl font-semibold text-ink tracking-tight">Pulse</h1>
           <p className="text-mutedLight text-sm mt-1">Daily tracker do time</p>
         </div>
 
@@ -58,7 +58,7 @@ export default function LoginPage() {
         </form>
 
         <p className="text-center text-xs text-muted mt-5">
-          <button onClick={() => navigate('/team')} className="hover:text-white transition-colors">
+          <button onClick={() => navigate('/team')} className="hover:text-ink transition-colors">
             Ver painel do time →
           </button>
         </p>

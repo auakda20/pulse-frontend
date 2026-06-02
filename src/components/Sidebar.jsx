@@ -31,7 +31,7 @@ export default function Sidebar() {
       <div className="px-5 py-4 border-b border-border">
         <div className="flex items-center gap-2.5">
           <img src="/logo.png" alt="Pulse" className="w-8 h-8 object-contain" />
-          <span className="text-white font-semibold text-sm tracking-tight">Pulse</span>
+          <span className="text-ink font-semibold text-sm tracking-tight">Pulse</span>
         </div>
       </div>
 
@@ -61,7 +61,7 @@ export default function Sidebar() {
             {user.name?.[0]?.toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-white text-xs font-medium truncate">{user.name}</div>
+            <div className="text-ink text-xs font-medium truncate">{user.name}</div>
             <div className="text-muted text-[11px] truncate">{user.email}</div>
           </div>
         </div>

@@ -95,7 +95,7 @@ export default function HistoryPage() {
   return (
     <div className="flex flex-col gap-5 pb-8">
       <div>
-        <h1 className="text-xl font-semibold text-white">Historico</h1>
+        <h1 className="text-xl font-semibold text-ink">Historico</h1>
         <p className="text-mutedLight text-sm mt-0.5">Horas trabalhadas, metas e atividades por membro</p>
       </div>
 
@@ -103,7 +103,7 @@ export default function HistoryPage() {
         {RANGES.map(r => (
           <button key={r.key} onClick={() => setRange(r.key)}
             className={'px-4 py-1.5 rounded text-sm font-medium transition-all ' +
-              (range === r.key ? 'bg-primary/10 text-primary' : 'text-muted hover:text-white')}>
+              (range === r.key ? 'bg-primary/10 text-primary' : 'text-muted hover:text-ink')}>
             {r.label}
           </button>
         ))}
@@ -139,11 +139,11 @@ export default function HistoryPage() {
                           style={{ backgroundColor: user.color }}>
                           {user.name[0].toUpperCase()}
                         </div>
-                        <span className="text-white text-xs font-medium truncate">{user.name}</span>
+                        <span className="text-ink text-xs font-medium truncate">{user.name}</span>
                       </div>
                     </td>
                     {dates.map(d => <HeatCell key={d} data={days[d]} />)}
-                    <td className="border-b border-l border-border/20 px-3 py-3 text-center text-white text-xs font-semibold">
+                    <td className="border-b border-l border-border/20 px-3 py-3 text-center text-ink text-xs font-semibold">
                       {fmtMinutes(totalMinutes) || '-'}
                     </td>
                   </tr>

@@ -46,7 +46,7 @@ export default function UsuariosPage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <UsersRound size={20} className="text-primary" />
-          <h1 className="text-xl font-semibold text-white">Usuários</h1>
+          <h1 className="text-xl font-semibold text-ink">Usuários</h1>
         </div>
         <button onClick={() => setForm({ ...NOVO })}
           className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded bg-primary/10 text-primary hover:bg-primary/20 transition-all">
@@ -61,7 +61,7 @@ export default function UsuariosPage() {
               style={{ backgroundColor: u.color || '#6366f1' }}>{u.name?.[0]?.toUpperCase()}</div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <span className="text-white text-sm font-medium truncate">{u.name}</span>
+                <span className="text-ink text-sm font-medium truncate">{u.name}</span>
                 {u.role === 'admin'
                   ? <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border text-primary border-primary/30 bg-primary/5">Admin</span>
                   : <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border text-muted border-border">Membro</span>}
@@ -70,8 +70,8 @@ export default function UsuariosPage() {
               <div className="text-xs text-muted truncate">{u.email}</div>
             </div>
             <div className="flex items-center gap-1 flex-shrink-0">
-              <button onClick={() => setForm({ ...u })} title="Editar" className="p-1.5 rounded text-muted hover:text-white hover:bg-surfaceHover"><Pencil size={14} /></button>
-              <button onClick={() => resetar(u)} title="Resetar senha" className="p-1.5 rounded text-muted hover:text-white hover:bg-surfaceHover"><KeyRound size={14} /></button>
+              <button onClick={() => setForm({ ...u })} title="Editar" className="p-1.5 rounded text-muted hover:text-ink hover:bg-surfaceHover"><Pencil size={14} /></button>
+              <button onClick={() => resetar(u)} title="Resetar senha" className="p-1.5 rounded text-muted hover:text-ink hover:bg-surfaceHover"><KeyRound size={14} /></button>
               {u.id !== me.id && (
                 <button onClick={() => excluir(u)} title="Remover" className="p-1.5 rounded text-muted hover:text-red hover:bg-red/5"><Trash2 size={14} /></button>
               )}
@@ -84,8 +84,8 @@ export default function UsuariosPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setForm(null)}>
           <div className="card w-full max-w-md" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-white font-semibold">{form.id ? 'Editar usuário' : 'Novo usuário'}</h2>
-              <button onClick={() => setForm(null)} className="text-muted hover:text-white"><X size={18} /></button>
+              <h2 className="text-ink font-semibold">{form.id ? 'Editar usuário' : 'Novo usuário'}</h2>
+              <button onClick={() => setForm(null)} className="text-muted hover:text-ink"><X size={18} /></button>
             </div>
             <div className="flex flex-col gap-3">
               <label className="flex flex-col gap-1"><span className="text-[11px] uppercase tracking-wider text-muted">Nome</span>

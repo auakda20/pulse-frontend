@@ -6,8 +6,8 @@ import { Plus, Pencil, Trash2, Github, ExternalLink, FileText, X, FolderKanban }
 const VERTICAIS = [{ key: 'auto', label: 'AUTO' }, { key: 'studio', label: 'STUDIO' }]
 const STATUS = {
   ativo:     { label: 'Ativo',     cls: 'text-green border-green/30 bg-green/5' },
-  pausado:   { label: 'Pausado',   cls: 'text-amber-400 border-amber-400/30 bg-amber-400/5' },
-  planejado: { label: 'Planejado', cls: 'text-blue-400 border-blue-400/30 bg-blue-400/5' },
+  pausado:   { label: 'Pausado',   cls: 'text-yellow border-yellow/30 bg-yellow/5' },
+  planejado: { label: 'Planejado', cls: 'text-primary border-primary/30 bg-primary/5' },
   arquivado: { label: 'Arquivado', cls: 'text-muted border-border bg-surfaceHover' },
 }
 const VAZIO = { nome: '', vertical: 'auto', status: 'ativo', responsavel: '', descricao: '', repoUrl: '', deployUrl: '', docsUrl: '', cor: '#6366f1', ordem: 0 }
@@ -20,7 +20,7 @@ function LinkBtn({ href, icon: Icon, label }) {
   if (!href) return null
   return (
     <a href={href} target="_blank" rel="noreferrer"
-      className="flex items-center gap-1 text-xs text-muted hover:text-white transition-colors">
+      className="flex items-center gap-1 text-xs text-muted hover:text-ink transition-colors">
       <Icon size={12} /> {label}
     </a>
   )
@@ -49,7 +49,7 @@ export default function ProjectsPage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <FolderKanban size={20} className="text-primary" />
-          <h1 className="text-xl font-semibold text-white">Projetos</h1>
+          <h1 className="text-xl font-semibold text-ink">Projetos</h1>
         </div>
         {isAdmin && (
           <button onClick={() => setForm({ ...VAZIO })}
@@ -73,14 +73,14 @@ export default function ProjectsPage() {
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-white font-medium">{p.nome}</span>
+                          <span className="text-ink font-medium">{p.nome}</span>
                           <span className={'text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded border ' + st.cls}>{st.label}</span>
                         </div>
                         {p.responsavel && <div className="text-xs text-muted mt-0.5">{p.responsavel}</div>}
                       </div>
                       {isAdmin && (
                         <div className="flex items-center gap-1 flex-shrink-0">
-                          <button onClick={() => setForm({ ...p })} className="p-1 rounded text-muted hover:text-white hover:bg-surfaceHover"><Pencil size={13} /></button>
+                          <button onClick={() => setForm({ ...p })} className="p-1 rounded text-muted hover:text-ink hover:bg-surfaceHover"><Pencil size={13} /></button>
                           <button onClick={() => excluir(p)} className="p-1 rounded text-muted hover:text-red hover:bg-red/5"><Trash2 size={13} /></button>
                         </div>
                       )}
@@ -108,8 +108,8 @@ export default function ProjectsPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setForm(null)}>
           <div className="card w-full max-w-md max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-white font-semibold">{form.id ? 'Editar projeto' : 'Novo projeto'}</h2>
-              <button onClick={() => setForm(null)} className="text-muted hover:text-white"><X size={18} /></button>
+              <h2 className="text-ink font-semibold">{form.id ? 'Editar projeto' : 'Novo projeto'}</h2>
+              <button onClick={() => setForm(null)} className="text-muted hover:text-ink"><X size={18} /></button>
             </div>
             <div className="flex flex-col gap-3">
               <Field label="Nome"><input className="input" value={form.nome} onChange={e => setForm({ ...form, nome: e.target.value })} /></Field>

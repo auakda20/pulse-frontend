@@ -24,7 +24,7 @@ function ToolbarBtn({ onClick, active, children, title }) {
       title={title}
       className={'p-1.5 rounded transition-all ' + (active
         ? 'bg-primary/10 text-primary'
-        : 'text-muted hover:text-white hover:bg-surfaceHover')}
+        : 'text-muted hover:text-ink hover:bg-surfaceHover')}
     >
       {children}
     </button>
@@ -89,7 +89,7 @@ export default function NotesPage() {
     <div className="flex flex-col gap-5 pb-8">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-white">Notas do dia</h1>
+          <h1 className="text-xl font-semibold text-ink">Notas do dia</h1>
           <p className="text-mutedLight text-sm mt-0.5 capitalize">{fmtDateFull()}</p>
         </div>
         <div className="flex items-center gap-2">

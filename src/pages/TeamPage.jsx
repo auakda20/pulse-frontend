@@ -45,7 +45,7 @@ export default function TeamPage() {
   const content = (
     <div className="flex flex-col gap-5 pb-8">
       <div>
-        <h1 className="text-xl font-semibold text-white">Time</h1>
+        <h1 className="text-xl font-semibold text-ink">Time</h1>
         <p className="text-mutedLight text-sm mt-0.5 capitalize">{nowSP}</p>
       </div>
 
@@ -76,7 +76,7 @@ export default function TeamPage() {
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-white font-medium text-sm">{user.name}</div>
+                  <div className="text-ink font-medium text-sm">{user.name}</div>
                   <div className="text-muted text-xs flex items-center gap-1">
                     <Clock size={10} />
                     {session?.openSession
@@ -99,9 +99,9 @@ export default function TeamPage() {
                       <div key={g.id} className="flex items-center gap-2">
                         <div className={'w-3.5 h-3.5 rounded border flex items-center justify-center flex-shrink-0 ' +
                           (g.completed ? 'bg-green border-green' : 'border-borderLight')}>
-                          {g.completed && <Check size={8} className="text-white" />}
+                          {g.completed && <Check size={8} className="text-ink" />}
                         </div>
-                        <span className={'text-xs flex-1 truncate ' + (g.completed ? 'line-through text-muted' : 'text-white/90')}>
+                        <span className={'text-xs flex-1 truncate ' + (g.completed ? 'line-through text-muted' : 'text-ink/90')}>
                           {g.title}
                         </span>
                         <span className={'badge border text-xs flex-shrink-0 ' + V_COLOR[g.vertical]}>{V_LABEL[g.vertical]}</span>
@@ -121,7 +121,7 @@ export default function TeamPage() {
                     {activities.map(a => (
                       <div key={a.id}>
                         <div className="flex items-center gap-2">
-                          <span className="text-white/90 text-xs flex-1 truncate">{a.title}</span>
+                          <span className="text-ink/90 text-xs flex-1 truncate">{a.title}</span>
                           <span className={'badge border text-xs flex-shrink-0 ' + V_COLOR[a.vertical]}>{V_LABEL[a.vertical]}</span>
                         </div>
                         {a.description && <p className="text-muted text-xs mt-0.5 truncate">{a.description}</p>}

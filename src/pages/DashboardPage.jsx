@@ -15,14 +15,14 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
-const VERTICALS = ['studio', 'originals', 'auto', 'agency', 'geral']
-const V_LABEL   = { studio: 'Studio', originals: 'Originals', auto: 'Auto', agency: 'Agency', geral: 'Geral' }
+const VERTICALS = ['auto', 'studio']
+const V_LABEL   = { auto: 'Auto', studio: 'Studio', originals: 'Originals', agency: 'Agency', geral: 'Geral' }
 const V_COLOR   = {
+  auto:      'bg-primary/10 text-primary border-primary/20',
   studio:    'bg-violet/10 text-violet border-violet/20',
   originals: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-  auto:      'bg-green/10 text-green border-green/20',
   agency:    'bg-yellow/10 text-yellow border-yellow/20',
-  geral:     'bg-white/5 text-mutedLight border-borderLight',
+  geral:     'bg-surfaceHover text-mutedLight border-borderLight',
 }
 const P_CONFIG  = {
   high:   { label: 'Alta',  color: 'text-red',       bg: 'bg-red/10 border-red/20' },
@@ -84,9 +84,9 @@ function SortableGoal({ goal, onToggle, onDelete, onPriority }) {
         className={'w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-all ' +
           (goal.completed ? 'bg-green border-green' : 'border-borderLight hover:border-primary/60')}
       >
-        {goal.completed && <Check size={9} className="text-white" />}
+        {goal.completed && <Check size={9} className="text-ink" />}
       </button>
-      <span className={'text-sm flex-1 ' + (goal.completed ? 'line-through text-muted' : 'text-white/90')}>
+      <span className={'text-sm flex-1 ' + (goal.completed ? 'line-through text-muted' : 'text-ink/90')}>
         {goal.title}
       </span>
       <div className="relative">
@@ -125,10 +125,10 @@ export default function DashboardPage() {
   const user = JSON.parse(localStorage.getItem('pulse_user') || '{}')
 
   const [goalTitle,    setGoalTitle]    = useState('')
-  const [goalVertical, setGoalVertical] = useState('geral')
+  const [goalVertical, setGoalVertical] = useState('auto')
   const [goalPriority, setGoalPriority] = useState('medium')
   const [actTitle,     setActTitle]     = useState('')
-  const [actVertical,  setActVertical]  = useState('geral')
+  const [actVertical,  setActVertical]  = useState('auto')
   const [actDesc,      setActDesc]      = useState('')
   const [goalOrder,    setGoalOrder]    = useState([])
   const [reminderOn,   setReminderOn]   = useState(true)
@@ -191,7 +191,7 @@ export default function DashboardPage() {
     <div className="flex flex-col gap-5 pb-8">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-white">Ola, {user.name?.split(' ')[0]}</h1>
+          <h1 className="text-xl font-semibold text-ink">Ola, {user.name?.split(' ')[0]}</h1>
           <p className="text-mutedLight text-sm mt-0.5 capitalize">{nowSP}</p>
         </div>
         <button onClick={() => setReminderOn(v => !v)}
@@ -207,7 +207,7 @@ export default function DashboardPage() {
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
               {isCheckedIn && <span className="w-2 h-2 rounded-full bg-green animate-pulse" />}
-              <span className="text-white font-medium text-sm">
+              <span className="text-ink font-medium text-sm">
                 {isCheckedIn ? 'Em trabalho' : hadSession ? 'Em pausa' : 'Pronto para comecar?'}
               </span>
             </div>
@@ -247,7 +247,7 @@ export default function DashboardPage() {
       <div className="card">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <div className="text-white font-medium text-sm">Metas do dia</div>
+            <div className="text-ink font-medium text-sm">Metas do dia</div>
             <div className="text-muted text-xs mt-0.5">{completedGoals}/{goals.length} concluidas</div>
           </div>
           {goals.length > 0 && (
@@ -292,7 +292,7 @@ export default function DashboardPage() {
 
       {/* Registrar atividade */}
       <div className="card">
-        <div className="text-white font-medium text-sm mb-4">Registrar atividade</div>
+        <div className="text-ink font-medium text-sm mb-4">Registrar atividade</div>
         <div className="flex flex-col gap-2">
           <div className="flex gap-2">
             <input className="input text-xs py-1.5 flex-1" placeholder="O que voce fez?"
@@ -315,7 +315,7 @@ export default function DashboardPage() {
 
       {acts.length > 0 && (
         <div className="card">
-          <div className="text-white font-medium text-sm mb-4">
+          <div className="text-ink font-medium text-sm mb-4">
             Atividades de hoje <span className="text-muted font-normal text-xs ml-1">{acts.length}</span>
           </div>
           <div className="flex flex-col gap-2.5">
@@ -324,7 +324,7 @@ export default function DashboardPage() {
                 <span className="w-1 h-1 rounded-full bg-muted mt-2 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-white/90 text-sm">{a.title}</span>
+                    <span className="text-ink/90 text-sm">{a.title}</span>
                     <span className={'badge border text-xs ' + V_COLOR[a.vertical]}>{V_LABEL[a.vertical]}</span>
                   </div>
                   {a.description && <p className="text-muted text-xs mt-0.5">{a.description}</p>}

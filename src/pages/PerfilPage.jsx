@@ -47,12 +47,12 @@ export default function PerfilPage() {
     <div className="flex flex-col gap-5 pb-8 max-w-lg">
       <div className="flex items-center gap-2">
         <UserCog size={20} className="text-primary" />
-        <h1 className="text-xl font-semibold text-white">Perfil</h1>
+        <h1 className="text-xl font-semibold text-ink">Perfil</h1>
       </div>
 
       {/* Dados */}
       <div className="card flex flex-col gap-3">
-        <h2 className="text-white font-medium text-sm">Dados</h2>
+        <h2 className="text-ink font-medium text-sm">Dados</h2>
         <div className="text-xs text-muted">{u.email} · {u.role === 'admin' ? 'Admin' : 'Membro'}</div>
         <label className="flex flex-col gap-1">
           <span className="text-[11px] uppercase tracking-wider text-muted">Nome</span>
@@ -68,7 +68,7 @@ export default function PerfilPage() {
 
       {/* Senha */}
       <div className="card flex flex-col gap-3">
-        <h2 className="text-white font-medium text-sm">Trocar senha</h2>
+        <h2 className="text-ink font-medium text-sm">Trocar senha</h2>
         <input className="input" type="password" placeholder="Senha atual" value={curr} onChange={e => setCurr(e.target.value)} />
         <input className="input" type="password" placeholder="Nova senha (mín. 6)" value={nova} onChange={e => setNova(e.target.value)} />
         <input className="input" type="password" placeholder="Confirmar nova senha" value={nova2} onChange={e => setNova2(e.target.value)} />
