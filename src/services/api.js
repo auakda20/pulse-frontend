@@ -9,8 +9,17 @@ api.interceptors.request.use(cfg => {
 })
 
 export const authService = {
-  login: (body) => api.post('/auth/login', body).then(r => r.data),
-  me:    ()     => api.get('/auth/me').then(r => r.data),
+  login:          (body) => api.post('/auth/login', body).then(r => r.data),
+  me:             ()     => api.get('/auth/me').then(r => r.data),
+  updateProfile:  (body) => api.put('/auth/me', body).then(r => r.data),
+  changePassword: (body) => api.put('/auth/password', body).then(r => r.data),
+}
+
+export const projectService = {
+  list:   (vertical) => api.get('/projects' + (vertical ? '?vertical=' + vertical : '')).then(r => r.data),
+  create: (body)     => api.post('/projects', body).then(r => r.data),
+  update: (id, body) => api.put('/projects/' + id, body).then(r => r.data),
+  remove: (id)       => api.delete('/projects/' + id).then(r => r.data),
 }
 
 export const sessionService = {

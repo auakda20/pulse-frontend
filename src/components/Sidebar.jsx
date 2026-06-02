@@ -1,13 +1,15 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Users, BarChart2, BookOpen, FileText, Compass, LogOut } from 'lucide-react'
+import { LayoutDashboard, FolderKanban, Users, BarChart2, BookOpen, FileText, Compass, UserCog, LogOut } from 'lucide-react'
 
 const NAV = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Meu dia' },
+  { to: '/projetos',  icon: FolderKanban,    label: 'Projetos' },
   { to: '/team',      icon: Users,           label: 'Time' },
   { to: '/history',   icon: BarChart2,        label: 'Histórico' },
   { to: '/log',       icon: BookOpen,         label: 'Registro' },
   { to: '/notes',     icon: FileText,         label: 'Notas' },
   { to: '/runbook',   icon: Compass,         label: 'Como Trabalhamos' },
+  { to: '/perfil',    icon: UserCog,         label: 'Perfil' },
 ]
 
 export default function Sidebar() {
