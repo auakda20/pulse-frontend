@@ -164,7 +164,7 @@ export default function DashboardPage() {
       const minutesIn = Math.floor((Date.now() - new Date(openSession.checkinAt)) / 60000)
       if (minutesIn > 0 && minutesIn % 30 === 0 && lastReminder.current !== minutesIn) {
         playReminderSound(); lastReminder.current = minutesIn
-        toast('Lembrete: voce ainda esta em check-in', { icon: '🔔', duration: 5000 })
+        toast('Lembrete: você ainda está em check-in', { duration: 5000 })
       }
     }, 60000)
     return () => clearInterval(id)
@@ -350,7 +350,7 @@ export default function DashboardPage() {
               {openPend.length > 0 && <span className="text-muted font-normal text-xs">{openPend.length}</span>}
             </h2>
             {openPend.length === 0 ? (
-              <p className="text-mutedLight text-xs">Tudo em dia. 🎉</p>
+              <p className="text-mutedLight text-xs">Tudo em dia.</p>
             ) : (
               <div className="flex flex-col gap-2.5">
                 {openPend.slice(0, 8).map(p => (
