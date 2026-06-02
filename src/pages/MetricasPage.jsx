@@ -4,7 +4,10 @@ import { metricService } from '../services/api'
 import toast from 'react-hot-toast'
 import PageHeader from '../components/PageHeader'
 import StatCard from '../components/StatCard'
-import { LineChart, Wallet, TrendingUp, CalendarClock, DollarSign, Plus, Trash2, X, Pencil } from 'lucide-react'
+import {
+  LineChart, Wallet, TrendingUp, CalendarClock, DollarSign, Banknote, Users2, UserCheck, Coins,
+  Plus, Trash2, X, Pencil,
+} from 'lucide-react'
 
 const fmtBRL = (n) => 'R$ ' + (Number(n) || 0).toLocaleString('pt-BR', { maximumFractionDigits: 0 })
 
@@ -16,10 +19,10 @@ function mesLabel(mes) {
   return new Date(+y, +m - 1, 1).toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }).replace('.', '')
 }
 function parseProjetos(s) { try { return JSON.parse(s || '[]') } catch { return [] } }
-function totalMrr(snap)  { return parseProjetos(snap?.projetos).reduce((a, p) => a + (p.mrr || 0), 0) }
-function totalRec(snap)  { return parseProjetos(snap?.projetos).reduce((a, p) => a + (p.receita || 0), 0) }
+function sum(snap, key) { return parseProjetos(snap?.projetos).reduce((a, p) => a + (p[key] || 0), 0) }
 
-const ROW_VAZIA = { nome: '', mrr: 0, receita: 0 }
+const ROW_VAZIA = { nome: '', mrr: 0, receita: 0, investido: 0, leads: 0, convertidos: 0, arrecadado: 0 }
+const PROJETOS_PADRAO = ['Kelsen', 'CasaPrime', 'Arbly', 'IA Contábil', 'STUDIO']
 
 export default function MetricasPage() {
   const qc = useQueryClient()
@@ -31,27 +34,37 @@ export default function MetricasPage() {
     mutationFn: (f) => metricService.save(f.mes, {
       caixa: +f.caixa, gastos: +f.gastos,
       kelsenCadastros: +f.kelsenCadastros, kelsenTestando: +f.kelsenTestando, kelsenPagantes: +f.kelsenPagantes,
-      projetos: f.projetos.map(p => ({ nome: p.nome, mrr: +p.mrr, receita: +p.receita })),
+      projetos: f.projetos.map(p => ({
+        nome: p.nome, mrr: +p.mrr, receita: +p.receita, investido: +p.investido,
+        leads: +p.leads, convertidos: +p.convertidos, arrecadado: +p.arrecadado,
+      })),
     }),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['metrics'] }); setForm(null); toast.success('Mês salvo') },
     onError:   (e) => toast.error(e.response?.data?.error || 'Erro ao salvar'),
   })
 
   const latest = snaps.length ? snaps[snaps.length - 1] : null
-  const mrr = totalMrr(latest)
+  const mrr        = sum(latest, 'mrr')
+  const investido  = sum(latest, 'investido')
+  const leads      = sum(latest, 'leads')
+  const convert    = sum(latest, 'convertidos')
+  const arrecadado = sum(latest, 'arrecadado')
+  const receita    = sum(latest, 'receita')
   const runway = latest && latest.gastos > 0 ? (latest.caixa / latest.gastos) : null
-  const maxMrr = useMemo(() => Math.max(1, ...snaps.map(totalMrr)), [snaps])
-  const conv = latest && latest.kelsenTestando > 0 ? Math.round((latest.kelsenPagantes / latest.kelsenTestando) * 100) : 0
+  const convPct = leads > 0 ? Math.round((convert / leads) * 100) : 0
+  const maxMrr = useMemo(() => Math.max(1, ...snaps.map(s => sum(s, 'mrr'))), [snaps])
+  const kConv = latest && latest.kelsenTestando > 0 ? Math.round((latest.kelsenPagantes / latest.kelsenTestando) * 100) : 0
 
   function abrirEditor(snap) {
     if (snap) {
+      const ps = parseProjetos(snap.projetos)
       setForm({
         mes: snap.mes, caixa: snap.caixa, gastos: snap.gastos,
         kelsenCadastros: snap.kelsenCadastros, kelsenTestando: snap.kelsenTestando, kelsenPagantes: snap.kelsenPagantes,
-        projetos: parseProjetos(snap.projetos).length ? parseProjetos(snap.projetos) : [{ ...ROW_VAZIA, nome: 'Kelsen' }],
+        projetos: ps.length ? ps.map(p => ({ ...ROW_VAZIA, ...p })) : PROJETOS_PADRAO.map(nome => ({ ...ROW_VAZIA, nome })),
       })
     } else {
-      const base = latest ? parseProjetos(latest.projetos).map(p => ({ ...p })) : [{ ...ROW_VAZIA, nome: 'Kelsen' }, { ...ROW_VAZIA, nome: 'STUDIO' }]
+      const base = latest ? parseProjetos(latest.projetos).map(p => ({ ...ROW_VAZIA, ...p })) : PROJETOS_PADRAO.map(nome => ({ ...ROW_VAZIA, nome }))
       setForm({ mes: currentMes(), caixa: latest?.caixa || 0, gastos: latest?.gastos || 0, kelsenCadastros: 0, kelsenTestando: 0, kelsenPagantes: 0, projetos: base })
     }
   }
@@ -78,29 +91,53 @@ export default function MetricasPage() {
         </div>
       ) : (
         <>
-          {/* Cockpit */}
+          {/* Cockpit — finanças */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <StatCard icon={Wallet}        label="Caixa"          value={fmtBRL(latest.caixa)} tone="primary" />
             <StatCard icon={TrendingUp}    label="MRR total"      value={fmtBRL(mrr)} sub={mesLabel(latest.mes)} tone="green" />
             <StatCard icon={CalendarClock} label="Runway"         value={runway != null ? runway.toFixed(1) + ' meses' : '—'} tone={runway != null && runway < 6 ? 'red' : 'muted'} />
-            <StatCard icon={DollarSign}    label="Receita do mês" value={fmtBRL(totalRec(latest))} />
+            <StatCard icon={DollarSign}    label="Receita do mês" value={fmtBRL(receita)} />
+          </div>
+          {/* Cockpit — aquisição */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <StatCard icon={Banknote}  label="Investido"        value={fmtBRL(investido)} tone="muted" />
+            <StatCard icon={Users2}    label="Leads"            value={leads} />
+            <StatCard icon={UserCheck} label="Leads convertidos" value={convert} sub={convPct + '%'} tone="green" />
+            <StatCard icon={Coins} label="Valor arrecadado" value={fmtBRL(arrecadado)} tone="green" />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-            {/* Coluna principal */}
             <div className="lg:col-span-2 flex flex-col gap-5">
-              {/* MRR por projeto */}
-              <div className="card">
-                <h2 className="text-ink font-semibold text-sm mb-3">MRR por projeto · {mesLabel(latest.mes)}</h2>
-                <div className="flex flex-col gap-2">
-                  {parseProjetos(latest.projetos).length === 0 && <p className="text-mutedLight text-xs">Nenhum projeto no snapshot.</p>}
-                  {parseProjetos(latest.projetos).map((p, i) => (
-                    <div key={i} className="flex items-center justify-between text-sm border-b border-border/60 last:border-0 py-1.5">
-                      <span className="text-ink">{p.nome}</span>
-                      <span className="font-display font-bold text-ink">{fmtBRL(p.mrr)}<span className="text-mutedLight font-normal text-xs">/mês</span></span>
-                    </div>
-                  ))}
-                </div>
+              {/* Tabela por projeto */}
+              <div className="card overflow-x-auto">
+                <h2 className="text-ink font-semibold text-sm mb-3">Por projeto · {mesLabel(latest.mes)}</h2>
+                <table className="w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="text-muted text-xs">
+                      <th className="text-left font-medium py-1.5">Projeto</th>
+                      <th className="text-right font-medium py-1.5">MRR</th>
+                      <th className="text-right font-medium py-1.5">Investido</th>
+                      <th className="text-right font-medium py-1.5">Leads</th>
+                      <th className="text-right font-medium py-1.5">Conv.</th>
+                      <th className="text-right font-medium py-1.5">Arrecadado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {parseProjetos(latest.projetos).map((p, i) => (
+                      <tr key={i} className="border-t border-border/60">
+                        <td className="text-ink py-2">{p.nome}</td>
+                        <td className="text-right text-ink py-2">{fmtBRL(p.mrr)}</td>
+                        <td className="text-right text-muted py-2">{fmtBRL(p.investido)}</td>
+                        <td className="text-right text-muted py-2">{p.leads || 0}</td>
+                        <td className="text-right text-muted py-2">{p.convertidos || 0}</td>
+                        <td className="text-right text-ink py-2">{fmtBRL(p.arrecadado)}</td>
+                      </tr>
+                    ))}
+                    {parseProjetos(latest.projetos).length === 0 && (
+                      <tr><td colSpan={6} className="text-mutedLight text-xs text-center py-4">Nenhum projeto no snapshot.</td></tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
 
               {/* Tendência MRR */}
@@ -111,7 +148,7 @@ export default function MetricasPage() {
                 ) : (
                   <div className="flex items-end gap-2 h-32">
                     {snaps.slice(-12).map(s => {
-                      const v = totalMrr(s)
+                      const v = sum(s, 'mrr')
                       return (
                         <div key={s.mes} className="flex-1 flex flex-col items-center gap-1.5 min-w-0">
                           <div className="w-full bg-primary/15 rounded-t relative flex-1 flex items-end" title={fmtBRL(v)}>
@@ -126,7 +163,7 @@ export default function MetricasPage() {
               </div>
             </div>
 
-            {/* Coluna lateral — funil Kelsen */}
+            {/* Funil Kelsen */}
             <div className="flex flex-col gap-5">
               <div className="card">
                 <h2 className="text-ink font-semibold text-sm mb-3">Funil Kelsen</h2>
@@ -136,7 +173,7 @@ export default function MetricasPage() {
                   <Funnel label="Pagantes"  value={latest.kelsenPagantes}  max={Math.max(1, latest.kelsenCadastros)} tone="green" />
                   <div className="flex items-center justify-between pt-2 border-t border-border/60">
                     <span className="text-muted text-xs">Conversão (testando → pagante)</span>
-                    <span className="font-display font-bold text-ink">{conv}%</span>
+                    <span className="font-display font-bold text-ink">{kConv}%</span>
                   </div>
                 </div>
               </div>
@@ -148,7 +185,7 @@ export default function MetricasPage() {
       {/* Editor */}
       {form && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setForm(null)}>
-          <div className="card w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+          <div className="card w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-ink font-semibold">Atualizar métricas</h2>
               <button onClick={() => setForm(null)} className="text-muted hover:text-ink"><X size={18} /></button>
@@ -167,23 +204,30 @@ export default function MetricasPage() {
 
               <div className="pt-1">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[11px] uppercase tracking-wider text-muted">Projetos (MRR / Receita)</span>
+                  <span className="text-[11px] uppercase tracking-wider text-muted">Projetos</span>
                   <button onClick={() => setForm({ ...form, projetos: [...form.projetos, { ...ROW_VAZIA }] })}
-                    className="text-xs text-primary flex items-center gap-1"><Plus size={12} /> linha</button>
+                    className="text-xs text-primary flex items-center gap-1"><Plus size={12} /> projeto</button>
                 </div>
-                <div className="flex flex-col gap-2">
-                  {form.projetos.map((p, i) => (
-                    <div key={i} className="flex gap-2 items-center">
-                      <input className="input flex-1" placeholder="Projeto" value={p.nome}
-                        onChange={e => { const ps = [...form.projetos]; ps[i] = { ...ps[i], nome: e.target.value }; setForm({ ...form, projetos: ps }) }} />
-                      <input className="input w-24" type="number" placeholder="MRR" value={p.mrr}
-                        onChange={e => { const ps = [...form.projetos]; ps[i] = { ...ps[i], mrr: e.target.value }; setForm({ ...form, projetos: ps }) }} />
-                      <input className="input w-24" type="number" placeholder="Receita" value={p.receita}
-                        onChange={e => { const ps = [...form.projetos]; ps[i] = { ...ps[i], receita: e.target.value }; setForm({ ...form, projetos: ps }) }} />
-                      <button onClick={() => setForm({ ...form, projetos: form.projetos.filter((_, j) => j !== i) })}
-                        className="text-mutedLight hover:text-red"><Trash2 size={14} /></button>
-                    </div>
-                  ))}
+                <div className="flex flex-col gap-3">
+                  {form.projetos.map((p, i) => {
+                    const upd = (k, v) => { const ps = [...form.projetos]; ps[i] = { ...ps[i], [k]: v }; setForm({ ...form, projetos: ps }) }
+                    return (
+                      <div key={i} className="border border-border rounded-lg p-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <input className="input flex-1 font-medium" placeholder="Nome do projeto" value={p.nome} onChange={e => upd('nome', e.target.value)} />
+                          <button onClick={() => setForm({ ...form, projetos: form.projetos.filter((_, j) => j !== i) })} className="text-mutedLight hover:text-red"><Trash2 size={14} /></button>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                          <MiniField label="MRR"><input className="input text-xs py-1.5" type="number" value={p.mrr} onChange={e => upd('mrr', e.target.value)} /></MiniField>
+                          <MiniField label="Receita"><input className="input text-xs py-1.5" type="number" value={p.receita} onChange={e => upd('receita', e.target.value)} /></MiniField>
+                          <MiniField label="Investido"><input className="input text-xs py-1.5" type="number" value={p.investido} onChange={e => upd('investido', e.target.value)} /></MiniField>
+                          <MiniField label="Leads"><input className="input text-xs py-1.5" type="number" value={p.leads} onChange={e => upd('leads', e.target.value)} /></MiniField>
+                          <MiniField label="Convertidos"><input className="input text-xs py-1.5" type="number" value={p.convertidos} onChange={e => upd('convertidos', e.target.value)} /></MiniField>
+                          <MiniField label="Arrecadado"><input className="input text-xs py-1.5" type="number" value={p.arrecadado} onChange={e => upd('arrecadado', e.target.value)} /></MiniField>
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             </div>
@@ -201,7 +245,9 @@ export default function MetricasPage() {
 function Field({ label, children }) {
   return <label className="flex flex-col gap-1"><span className="text-[11px] uppercase tracking-wider text-muted">{label}</span>{children}</label>
 }
-
+function MiniField({ label, children }) {
+  return <label className="flex flex-col gap-0.5"><span className="text-[10px] uppercase tracking-wider text-mutedLight">{label}</span>{children}</label>
+}
 function Funnel({ label, value, max, tone = 'primary' }) {
   const pct = Math.max(2, Math.round((value / max) * 100))
   return (
