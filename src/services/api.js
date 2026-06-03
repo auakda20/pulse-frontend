@@ -73,6 +73,14 @@ export const metricService = {
   remove: (mes)        => api.delete('/metrics/' + mes).then(r => r.data),
 }
 
+export const calendarService = {
+  list:   ()         => api.get('/calendar/events').then(r => r.data),
+  create: (body)     => api.post('/calendar/events', body).then(r => r.data),
+  update: (id, body) => api.patch('/calendar/events/' + id, body).then(r => r.data),
+  remove: (id)       => api.delete('/calendar/events/' + id).then(r => r.data),
+  feedUrl: (token)   => (import.meta.env.VITE_API_URL || '/api') + '/calendar/feed.ics?token=' + encodeURIComponent(token || ''),
+}
+
 export const runbookService = {
   list:   (vertical) => api.get('/runbook' + (vertical ? '?vertical=' + vertical : '')).then(r => r.data),
   get:    (slug)     => api.get('/runbook/' + slug).then(r => r.data),
