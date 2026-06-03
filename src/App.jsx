@@ -12,6 +12,7 @@ import PerfilPage    from './pages/PerfilPage'
 import UsuariosPage  from './pages/UsuariosPage'
 import MetricasPage  from './pages/MetricasPage'
 import CalendarPage  from './pages/CalendarPage'
+import ProdutividadePage from './pages/ProdutividadePage'
 
 function RequireAuth({ children }) {
   return localStorage.getItem('pulse_token')
@@ -34,6 +35,7 @@ export default function App() {
       <Route path="/perfil"    element={<RequireAuth><PerfilPage /></RequireAuth>} />
       <Route path="/usuarios"  element={<RequireAuth><UsuariosPage /></RequireAuth>} />
       <Route path="/metricas"  element={<RequireAuth><MetricasPage /></RequireAuth>} />
+      <Route path="/produtividade" element={<RequireAuth><ProdutividadePage /></RequireAuth>} />
       <Route path="*"          element={<Navigate to="/dashboard" replace />} />
     </Routes>
   )

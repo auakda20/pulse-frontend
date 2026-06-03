@@ -31,10 +31,12 @@ export const userService = {
 }
 
 export const sessionService = {
-  checkin:  ()      => api.post('/sessions/checkin').then(r => r.data),
-  checkout: ()      => api.post('/sessions/checkout').then(r => r.data),
-  today:    ()      => api.get('/sessions/today').then(r => r.data),
-  history:  (range) => api.get('/sessions/history?range=' + range).then(r => r.data),
+  checkin:   ()      => api.post('/sessions/checkin').then(r => r.data),
+  checkout:  ()      => api.post('/sessions/checkout').then(r => r.data),
+  heartbeat: ()      => api.post('/sessions/heartbeat').then(r => r.data),
+  today:     ()      => api.get('/sessions/today').then(r => r.data),
+  history:   (range) => api.get('/sessions/history?range=' + range).then(r => r.data),
+  produtividade: (range) => api.get('/sessions/produtividade?range=' + range).then(r => r.data),
 }
 
 export const goalService = {

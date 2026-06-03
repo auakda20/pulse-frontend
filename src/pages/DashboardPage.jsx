@@ -170,6 +170,30 @@ export default function DashboardPage() {
     return () => clearInterval(id)
   }, [isCheckedIn, reminderOn, openSession])
 
+  // C — heartbeat só enquanto ATIVO: mantém a sessão viva apenas se houve interação
+  // recente e a aba está visível. Sem interação → para de pingar → o backend fecha a
+  // sessão como ociosa (não conta tempo parado). Anti-"deixei o check-in ligado".
+  const [showIdle, setShowIdle] = useState(false)
+  const lastActivityRef = useRef(Date.now())
+  useEffect(() => {
+    const bump = () => { lastActivityRef.current = Date.now(); setShowIdle(false) }
+    const evs = ['mousemove', 'keydown', 'mousedown', 'scroll', 'touchstart']
+    evs.forEach(e => window.addEventListener(e, bump, { passive: true }))
+    return () => evs.forEach(e => window.removeEventListener(e, bump))
+  }, [])
+  useEffect(() => {
+    if (!isCheckedIn) { setShowIdle(false); return }
+    const HEARTBEAT = 120000, ACTIVE = 300000, IDLE_PROMPT = 480000
+    const ping = () => {
+      const idleMs = Date.now() - lastActivityRef.current
+      if (document.visibilityState === 'visible' && idleMs < ACTIVE) sessionService.heartbeat().catch(() => {})
+      if (idleMs >= IDLE_PROMPT) setShowIdle(true)
+    }
+    ping()
+    const id = setInterval(ping, HEARTBEAT)
+    return () => clearInterval(id)
+  }, [isCheckedIn])
+
   const checkinMut   = useMutation({ mutationFn: sessionService.checkin,  onSuccess: () => { qc.invalidateQueries({ queryKey: ['session'] }); toast.success('Check-in feito!') }, onError: e => toast.error(e.response?.data?.error || 'Erro') })
   const checkoutMut  = useMutation({ mutationFn: sessionService.checkout, onSuccess: () => { qc.invalidateQueries({ queryKey: ['session'] }); toast.success('Check-out feito!') }, onError: e => toast.error(e.response?.data?.error || 'Erro') })
   const addGoalMut   = useMutation({ mutationFn: goalService.create,      onSuccess: () => { qc.invalidateQueries({ queryKey: ['goals'] }); setGoalTitle('') } })
@@ -238,12 +262,12 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* KPIs */}
+      {/* KPIs — entrega primeiro (D); horas por último, como consequência, não como meta */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard icon={Timer}        label="Trabalhado hoje" value={fmtMinutes(totalDisplay)} tone={isCheckedIn ? 'green' : 'muted'} />
         <StatCard icon={Target}       label="Metas do dia"    value={`${completedGoals}/${goals.length}`} sub={progressPct + '%'} />
+        <StatCard icon={ActivityIcon} label="Atividades hoje" value={acts.length} tone={acts.length ? 'green' : 'muted'} />
         <StatCard icon={AlertTriangle} label="Pendências abertas" value={openPend.length} tone={openPend.length ? 'red' : 'muted'} />
-        <StatCard icon={ActivityIcon} label="Atividades hoje" value={acts.length} />
+        <StatCard icon={Timer}        label="Trabalhado hoje" value={fmtMinutes(totalDisplay)} tone={isCheckedIn ? 'green' : 'muted'} />
       </div>
 
       {/* Grid principal */}
@@ -373,6 +397,22 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* C — "Ainda trabalhando?" (ocioso). Não responder = backend fecha no último heartbeat. */}
+      {showIdle && isCheckedIn && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-surface border border-border rounded-2xl w-full max-w-sm p-6 text-center flex flex-col gap-3">
+            <h3 className="text-ink font-semibold">Ainda trabalhando?</h3>
+            <p className="text-muted text-sm">Sem atividade há alguns minutos. Se você estiver ausente, o tempo parado não é contado.</p>
+            <div className="flex gap-2 justify-center mt-1">
+              <button onClick={() => { lastActivityRef.current = Date.now(); setShowIdle(false); sessionService.heartbeat().catch(() => {}) }}
+                className="btn-primary text-sm px-4 py-2">Sim, continuar</button>
+              <button onClick={() => { setShowIdle(false); checkoutMut.mutate() }}
+                className="btn-ghost text-sm px-4 py-2">Fazer check-out</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
