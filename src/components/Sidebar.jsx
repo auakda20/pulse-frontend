@@ -1,11 +1,12 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, FolderKanban, Users, BarChart2, BookOpen, FileText, Compass, UserCog, UsersRound, LineChart, CalendarDays, LogOut } from 'lucide-react'
+import { LayoutDashboard, FolderKanban, Users, BarChart2, BookOpen, FileText, Compass, UserCog, UsersRound, LineChart, CalendarDays, Gauge, LogOut } from 'lucide-react'
 
 const NAV = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Meu dia' },
   { to: '/projetos',  icon: FolderKanban,    label: 'Projetos' },
   { to: '/calendario', icon: CalendarDays,   label: 'Calendário' },
   { to: '/metricas',  icon: LineChart,       label: 'Métricas', admin: true },
+  { to: '/produtividade', icon: Gauge,       label: 'Produtividade', admin: true },
   { to: '/team',      icon: Users,           label: 'Time' },
   { to: '/history',   icon: BarChart2,        label: 'Histórico' },
   { to: '/log',       icon: BookOpen,         label: 'Registro' },
