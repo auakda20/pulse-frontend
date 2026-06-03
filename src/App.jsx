@@ -11,6 +11,7 @@ import ProjectsPage  from './pages/ProjectsPage'
 import PerfilPage    from './pages/PerfilPage'
 import UsuariosPage  from './pages/UsuariosPage'
 import MetricasPage  from './pages/MetricasPage'
+import CalendarPage  from './pages/CalendarPage'
 
 function RequireAuth({ children }) {
   return localStorage.getItem('pulse_token')
@@ -27,6 +28,7 @@ export default function App() {
       <Route path="/history"   element={<RequireAuth><HistoryPage /></RequireAuth>} />
       <Route path="/log"       element={<RequireAuth><LogPage /></RequireAuth>} />
       <Route path="/notes"     element={<RequireAuth><NotesPage /></RequireAuth>} />
+      <Route path="/calendario" element={<RequireAuth><CalendarPage /></RequireAuth>} />
       <Route path="/runbook"   element={<RequireAuth><RunbookPage /></RequireAuth>} />
       <Route path="/projetos"  element={<RequireAuth><ProjectsPage /></RequireAuth>} />
       <Route path="/perfil"    element={<RequireAuth><PerfilPage /></RequireAuth>} />
